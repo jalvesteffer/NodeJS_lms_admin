@@ -1,4 +1,3 @@
-# NodeJS_lms_admin
 # Add your own DB connection file named db.js:
 
 var mysql = require('mysql');
