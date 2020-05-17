@@ -1,3 +1,6 @@
+# My databse connection file
+db.js
+
 # Logs
 logs
 *.log
