@@ -7,3 +7,11 @@ exports.getAllBorrowers = function () {
     });
   });;
 };
+
+exports.getBorrowerById = function (id) {
+  return new Promise(function (resolve, reject) {
+    db.query('SELECT * FROM library.tbl_borrower WHERE cardNo=?', [id], function (err, result) {
+      return err ? reject(err) : resolve(result);
+    });
+  });;
+};

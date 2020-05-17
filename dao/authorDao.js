@@ -7,3 +7,11 @@ exports.getAllAuthors = function () {
     });
   });;
 };
+
+exports.getAuthorById = function (id) {
+  return new Promise(function (resolve, reject) {
+    db.query('SELECT * FROM tbl_author WHERE authorId=?', [id], function (err, result) {
+      return err ? reject(err) : resolve(result);
+    });
+  });;
+};

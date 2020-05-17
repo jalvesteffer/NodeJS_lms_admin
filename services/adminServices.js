@@ -18,8 +18,30 @@ exports.getAllAuthors = (function (req, res) {
         });
 });
 
+exports.getAuthorById = (function (id, req, res) {
+    authorDao.getAuthorById(id)
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
 exports.getAllBooks = (function (req, res) {
     bookDao.getAllBooks()
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
+exports.getBookById = (function (id, req, res) {
+    bookDao.getBookById(id)
         .then(function (result) {
             res.setHeader('Content-Type', 'application/json');
             res.send(result);
@@ -40,8 +62,30 @@ exports.getAllPublishers = (function (req, res) {
         });
 });
 
+exports.getPublisherById = (function (id, req, res) {
+    publisherDao.getPublisherById(id)
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
 exports.getAllGenres = (function (req, res) {
     genreDao.getAllGenres()
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
+exports.getGenreById = (function (id, req, res) {
+    genreDao.getGenreById(id)
         .then(function (result) {
             res.setHeader('Content-Type', 'application/json');
             res.send(result);
@@ -62,8 +106,30 @@ exports.getBorrowers = (function (req, res) {
         });
 });
 
+exports.getBorrowerById = (function (id, req, res) {
+    borrowerDao.getBorrowerById(id)
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
 exports.getBranches = (function (req, res) {
     branchDao.getAllBranches()
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(result);
+        })
+        .catch(function (err) {
+            throw err;
+        });
+});
+
+exports.getBranchById = (function (id, req, res) {
+    branchDao.getBranchById(id)
         .then(function (result) {
             res.setHeader('Content-Type', 'application/json');
             res.send(result);

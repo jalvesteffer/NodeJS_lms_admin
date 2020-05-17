@@ -8,16 +8,10 @@ exports.getAllBranches = function () {
   });;
 };
 
-/* exports.getLibraryBranchById = function (branchId) {
+exports.getBranchById = function (id) {
   return new Promise(function (resolve, reject) {
-    db.query('select * from library.tbl_library_branch where branchId = ?', [branchId], function (err, result) {
+    db.query('SELECT * FROM library.tbl_library_branch WHERE branchId=?', [id], function (err, result) {
       return err ? reject(err) : resolve(result);
     });
   });;
 };
-
-exports.updateLibraryBranch = function (branchId, branchName, branchAddress,cb) {
-  db.query('update library.tbl_library_branch set branchName = ? and branchAddress = ? where branchId = ?', [branchName, branchAddress, branchId], function (err, result) {
-    cb(err, result);
-  }); 
-};*/
