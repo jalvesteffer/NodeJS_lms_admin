@@ -2,7 +2,7 @@ var db = require('../db');
 
 exports.getAllBooks = function () {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT ba.bookId, b.title, GROUP_CONCAT(Distinct a.authorName) AS authors, p.publisherName AS publisher, GROUP_CONCAT( Distinct g.genre_name) AS genres ' +
+    db.query('SELECT ba.bookId, b.title, GROUP_CONCAT(Distinct a.authorName SEPARATOR \', \') AS authors, p.publisherName AS publisher, GROUP_CONCAT( Distinct g.genre_name SEPARATOR \', \') AS genres ' +
       'FROM library.tbl_author a ' +
       'INNER JOIN library.tbl_book_authors ba ON a.authorId = ba.authorId ' +
       'INNER JOIN library.tbl_book b ON b.bookId = ba.bookId ' +
@@ -18,7 +18,7 @@ exports.getAllBooks = function () {
 exports.getBookById = function (id) {
   return new Promise(function (resolve, reject) {
 
-    db.query('SELECT ba.bookId, b.title, GROUP_CONCAT(Distinct a.authorName) AS authors, p.publisherName AS publisher, GROUP_CONCAT( Distinct g.genre_name) AS genres ' +
+    db.query('SELECT ba.bookId, b.title, GROUP_CONCAT(Distinct a.authorName SEPARATOR \', \') AS authors, p.publisherName AS publisher, GROUP_CONCAT( Distinct g.genre_name SEPARATOR \', \') AS genres ' +
       'FROM library.tbl_author a ' +
       'INNER JOIN library.tbl_book_authors ba ON a.authorId = ba.authorId ' +
       'INNER JOIN library.tbl_book b ON b.bookId = ba.bookId ' +
