@@ -15,3 +15,13 @@ exports.getGenreById = function (id) {
     });
   });;
 };
+
+exports.updateGenre = function (genre, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('UPDATE tbl_genre ' +
+      'SET genre_name=? ' +
+      'WHERE genre_id=?', [genre.genre_name, genre.genre_id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

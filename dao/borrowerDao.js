@@ -15,3 +15,13 @@ exports.getBorrowerById = function (id) {
     });
   });;
 };
+
+exports.updateBorrower = function (borrower, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('UPDATE tbl_borrower ' +
+      'SET name=?, address=?, phone=? ' +
+      'WHERE cardNo=?', [borrower.name, borrower.address, borrower.phone, borrower.cardNo], function (err, result) {
+      cb(err, result);
+    });
+  });
+};
