@@ -25,3 +25,12 @@ exports.updatePublisher = function (publisher, cb) {
     });
   });
 };
+
+exports.createPublisher = function (publisher, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) ' +
+      'VALUES (?, ?, ?)', [publisher.publisherName, publisher.publisherAddress, publisher.publisherPhone], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

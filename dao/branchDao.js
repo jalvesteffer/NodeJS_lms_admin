@@ -25,3 +25,12 @@ exports.updateBranch = function (branch, cb) {
     });
   });
 };
+
+exports.createBranch = function (branch, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_library_branch (branchName, branchAddress) ' +
+      'VALUES (?, ?)', [branch.branchName, branch.branchAddress], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

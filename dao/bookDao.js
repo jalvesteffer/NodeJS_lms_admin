@@ -12,7 +12,7 @@ exports.getAllBooks = function () {
       'GROUP BY bookId ', function (err, result) {
       return err ? reject(err) : resolve(result);
     });
-  });;
+  });
 };
 
 exports.getBookById = function (id) {
@@ -30,5 +30,15 @@ exports.getBookById = function (id) {
 
       return err ? reject(err) : resolve(result);
     });
-  });;
+  });
+};
+
+exports.updateBook = function (book, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('UPDATE tbl_book AS b ' +
+      'SET b.title=?, b.pubId=? ' +
+      'WHERE b.bookId =? ', [book.title, book.pubId, book. bookId], function (err, result) {
+      cb(err, result);
+    });
+  });
 };
