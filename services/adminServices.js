@@ -5,7 +5,7 @@ let publisherDao = require('../dao/publisherDao');
 let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
-
+let key = -1;
 
 exports.getAllAuthors = (function (req, res) {
     authorDao.getAllAuthors()
@@ -110,15 +110,16 @@ exports.updateBook = (function(req,res) {
 exports.createBook = async function createBookTransaction(req,res) {
     
     
-    await createBookOne(req,res);
+    let key = await createBookOne(req,res);
 
+    console.log("Outside Key: " + key);
     // this function need the key of newly created book from above method
     createBookAuthors(req,res);
     
     
 }
 
-function createBookOne(req,res) {
+async function createBookOne(req,res) {
     let book = req.body;
 
     bookDao.createBook(book, function(err, result) {
@@ -133,7 +134,9 @@ function createBookOne(req,res) {
           // Need this value in parent createBook method
           // in order to pass it to the next method "createBookAuthors"
           // that establishes author-book relationships in tbl_book_authors
-          key = result.insertId;
+          console.log("Inside Key: " + result.insertId);
+          return result.insertId;
+          
           console.log(result.insertId);
           
 
@@ -141,7 +144,7 @@ function createBookOne(req,res) {
     });
 };
 
-function createBookAuthors(req,res) {
+async function createBookAuthors(req,res) {
     let book = req.body;
     console.log(book);
     
