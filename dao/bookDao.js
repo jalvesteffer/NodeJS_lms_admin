@@ -42,3 +42,21 @@ exports.updateBook = function (book, cb) {
     });
   });
 };
+
+exports.createBook = function (book, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_book (title, pubId) ' +
+      'VALUES (?, ?)', [book.title, book.pubId], function (err, result) {
+      cb(err, result);
+    });
+  });
+};
+
+exports.addBookAuthorRelationship = function (book, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_book_authors (bookId, authorId) ' +
+      'VALUES (?, ?)', [book.bookId, book.author.authorId], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

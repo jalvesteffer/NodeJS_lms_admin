@@ -10,6 +10,7 @@ routes.post('/lms/admin/authors', adminService.createAuthor);
 routes.get('/lms/admin/books',adminService.getAllBooks);
 routes.get('/lms/admin/books/:id',adminService.getBookById);
 routes.put('/lms/admin/books', adminService.updateBook);
+routes.post('/lms/admin/books', adminService.createBook);
 
 routes.get('/lms/admin/publishers', adminService.getAllPublishers);
 routes.get('/lms/admin/publishers/:id', adminService.getPublisherById);

@@ -107,6 +107,54 @@ exports.updateBook = (function(req,res) {
     });
 });
 
+exports.createBook = async function createBookTransaction(req,res) {
+    
+    
+    await createBookOne(req,res);
+
+    // this function need the key of newly created book from above method
+    createBookAuthors(req,res);
+    
+    
+}
+
+function createBookOne(req,res) {
+    let book = req.body;
+
+    bookDao.createBook(book, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Update Failed!');
+          }
+          
+          res.status(204);
+
+          // THIS IS THE KEY OF THE NEW BOOK CREATED
+          // Need this value in parent createBook method
+          // in order to pass it to the next method "createBookAuthors"
+          // that establishes author-book relationships in tbl_book_authors
+          key = result.insertId;
+          console.log(result.insertId);
+          
+
+          /* res.send('Update Successful!'); */
+    });
+};
+
+function createBookAuthors(req,res) {
+    let book = req.body;
+    console.log(book);
+    
+    console.log("Inside createBookTwo");
+    bookDao.addBookAuthorRelationship(book, function(err, result) {
+        if(err){
+            res.status(400);
+          }
+          res.status(204);
+          res.send('Create book transaction completed');
+    });
+};
+
 exports.getAllPublishers = (function (req, res) {
     publisherDao.getAllPublishers()
         .then(function (result) {
