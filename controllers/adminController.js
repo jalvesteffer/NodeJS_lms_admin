@@ -2,13 +2,9 @@
 var routes = require('express').Router();
 var adminService = require('../services/adminServices');
 
-routes.get('/lms/admin/authors',function(req,res){
-    adminService.getAllAuthors(req, res);
-});
-
-routes.get('/lms/admin/authors/:id',function(req,res){
-    adminService.getAuthorById(req.params.id, req, res);
-});
+routes.get('/lms/admin/authors', adminService.getAllAuthors);
+routes.get('/lms/admin/authors/:id', adminService.getAuthorById);
+routes.put('/lms/admin/authors', adminService.updateAuthor);
 
 routes.get('/lms/admin/books',function(req,res){
     adminService.getAllBooks(req,res);
@@ -18,50 +14,25 @@ routes.get('/lms/admin/books/:id',function(req,res){
     adminService.getBookById(req.params.id, req, res);
 });
 
-routes.get('/lms/admin/publishers',function(req,res){
-    adminService.getAllPublishers(req,res);
-});
+routes.get('/lms/admin/publishers', adminService.getAllPublishers);
+routes.get('/lms/admin/publishers/:id', adminService.getPublisherById);
+routes.put('/lms/admin/publishers', adminService.updatePublisher);
 
-routes.get('/lms/admin/publishers/:id',function(req,res){
-    adminService.getPublisherById(req.params.id, req, res);
-});
+routes.get('/lms/admin/genres', adminService.getAllGenres);
+routes.get('/lms/admin/genres/:id',adminService.getGenreById);
+routes.put('/lms/admin/genres', adminService.updateGenre);
 
-routes.get('/lms/admin/genres',function(req,res){
-    adminService.getAllGenres(req,res);
-});
+routes.get('/lms/admin/borrowers', adminService.getBorrowers);
+routes.get('/lms/admin/borrowers/:id', adminService.getBorrowerById);
+routes.put('/lms/admin/borrowers', adminService.updateBorrower);
 
-routes.get('/lms/admin/genres/:id',function(req,res){
-    adminService.getGenreById(req.params.id, req, res);
-});
+routes.get('/lms/admin/branches', adminService.getBranches);
+routes.get('/lms/admin/branches/:id', adminService.getBranchById);
+routes.put('/lms/admin/branches', adminService.updateBranch);
 
-routes.get('/lms/admin/borrowers',function(req,res){
-    adminService.getBorrowers(req,res);
-});
 
-routes.get('/lms/admin/borrowers/:id',function(req,res){
-    adminService.getBorrowerById(req.params.id, req, res);
-});
 
-routes.get('/lms/admin/branches',function(req,res){
-    adminService.getBranches(req,res);
-});
-
-routes.get('/lms/admin/branches/:id',function(req,res){
-    adminService.getBranchById(req.params.id, req, res);
-});
-
-/* routes.get('/lms/library/branches/branch/:branchId',function(req,res){
-    libraryService.getBranchByBranchId (req.params.branchId, req,res);
-});
-
-routes.put('/lms/library/branches/branch/:branchId',function(req,res){
-    const branchName = req.body.branchName;
-    const branchAddress = req.body.branchAddress;
-    console.log(branchName);
-    libraryService.updateBranch(req.params.branchId, branchName, branchAddress, req,res);
-});
-
-routes.get('/lms/library/branches/branch/:branchId/bookCopies',function(req,res){
+/*routes.get('/lms/library/branches/branch/:branchId/bookCopies',function(req,res){
     libraryService.getBookCopies(req.params.branchId, req,res);
 });
 
