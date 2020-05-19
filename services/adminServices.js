@@ -1,11 +1,11 @@
-/* var bookCopiesDao = require('../dao/bookCopiesDao'); */
 let authorDao = require('../dao/authorDao');
 let bookDao = require('../dao/bookDao');
 let publisherDao = require('../dao/publisherDao');
 let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
-let key = -1;
+let bookLoansDao = require('../dao/bookLoansDao');
+var LocalDate = require("@js-joda/core").LocalDate;
 
 exports.getAllAuthors = (function (req, res) {
     authorDao.getAllAuthors()
@@ -56,6 +56,17 @@ exports.createAuthor = (function(req,res) {
           }
           res.status(204);
           res.send('Create Successful!');
+    });
+});
+
+exports.deleteAuthor = (function(req,res) {
+    authorDao.deleteAuthor(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
     });
 });
 
@@ -164,9 +175,18 @@ async function createBookGenres(req,res) {
         });
         
     }
-
-    
 };
+
+exports.deleteBook = (function(req,res) {
+    bookDao.deleteBook(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
+    });
+});
 
 exports.getAllPublishers = (function (req, res) {
     publisherDao.getAllPublishers()
@@ -215,6 +235,17 @@ exports.createPublisher = (function(req,res) {
           }
           res.status(204);
           res.send('Create Successful!');
+    });
+});
+
+exports.deletePublisher = (function(req,res) {
+    publisherDao.deletePublisher(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
     });
 });
 
@@ -268,6 +299,17 @@ exports.createGenre = (function(req,res) {
     });
 });
 
+exports.deleteGenre = (function(req,res) {
+    genreDao.deleteGenre(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
+    });
+});
+
 exports.getBorrowers = (function (req, res) {
     borrowerDao.getAllBorrowers()
         .then(function (result) {
@@ -315,6 +357,17 @@ exports.createBorrower = (function(req,res) {
           }
           res.status(204);
           res.send('Create Successful!');
+    });
+});
+
+exports.deleteBorrower = (function(req,res) {
+    borrowerDao.deleteBorrower(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
     });
 });
 
@@ -366,3 +419,57 @@ exports.createBranch = (function(req,res) {
           res.send('Create Successful!');
     });
 });
+
+exports.deleteBranch = (function(req,res) {
+    branchDao.deleteBranch(req.params.id, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Delete Failed!');
+          }
+          res.status(200);
+          res.send('Delete Successful!');
+    });
+});
+
+//
+// extends book loan due date by 7 days
+//
+exports.extendLoan = async function extendLoan(req, res) {
+    
+    // make sure all key loan details provided to identify book loan to extend
+    if (req.body.bookId && req.body.branchId && req.body.cardNo && req.body.dateOut) {
+        // look for matching book loan to extend
+        await bookLoansDao.findBookLoansById(req.body)
+        .then(function (result) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+
+            // get loan due date
+            let dateTime = new Date(result[0].dueDate.toISOString());
+
+            // add 7 days to loan due date
+            dateTime.setDate(dateTime.getDate() + parseInt(7));
+            req.body.dueDate = dateTime.toISOString().slice(0, 10);
+
+            // save new due date for loan
+            bookLoansDao.saveBookLoansById(req.body)
+            .then(function (result) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+            })
+            .catch(function (err) {
+                res.status(400);
+            });
+
+            res.send(result);
+        })
+        .catch(function (err) {
+            console.log("Error processing request");
+            res.status(400);
+        });
+
+    } else {
+        console.log("Insufficient loan details provided.  Could not process request.");
+        res.status(400);
+    }
+};

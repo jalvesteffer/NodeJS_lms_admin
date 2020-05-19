@@ -33,3 +33,11 @@ exports.createGenre = function (genre, cb) {
     });
   });
 };
+
+exports.deleteGenre = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_genre WHERE genre_id=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

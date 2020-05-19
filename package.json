@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/jalvesteffer/NodeJS_lms_admin#readme",
   "dependencies": {
+    "@js-joda/core": "^2.0.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "localdate": "^3.0.2",
     "mysql": "^2.18.1"
   }
 }

@@ -34,3 +34,11 @@ exports.createPublisher = function (publisher, cb) {
     });
   });
 };
+
+exports.deletePublisher = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_publisher WHERE PublisherId=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

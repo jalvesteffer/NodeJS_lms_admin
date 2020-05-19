@@ -76,3 +76,11 @@ exports.addBookGenreRelationship = function (bookArray, cb) {
     });
   });
 };
+
+exports.deleteBook = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_book WHERE bookId=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

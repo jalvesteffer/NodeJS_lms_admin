@@ -34,3 +34,11 @@ exports.createBranch = function (branch, cb) {
     });
   });
 };
+
+exports.deleteBranch = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_library_branch WHERE branchId=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

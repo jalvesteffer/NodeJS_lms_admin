@@ -31,3 +31,12 @@ exports.createAuthor = function (author, cb) {
     });
   });
 };
+
+exports.deleteAuthor = function (authorId, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_author ' +
+      'WHERE authorId=?', [authorId], function (err, result) {
+      cb(err, result);
+    });
+  });
+};
