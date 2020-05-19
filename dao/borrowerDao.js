@@ -25,3 +25,11 @@ exports.updateBorrower = function (borrower, cb) {
     });
   });
 };
+
+exports.createBorrower = function (borrower, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [borrower.name, borrower.address, borrower.phone], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

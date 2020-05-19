@@ -5,7 +5,7 @@ let publisherDao = require('../dao/publisherDao');
 let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
-
+let key = -1;
 
 exports.getAllAuthors = (function (req, res) {
     authorDao.getAllAuthors()
@@ -46,6 +46,19 @@ exports.updateAuthor = (function(req,res) {
     });
 });
 
+exports.createAuthor = (function(req,res) {
+    let author = req.body;
+
+    authorDao.createAuthor(author, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Create Failed!');
+          }
+          res.status(204);
+          res.send('Create Successful!');
+    });
+});
+
 exports.getAllBooks = (function (req, res) {
     bookDao.getAllBooks()
         .then(function (result) {
@@ -58,8 +71,8 @@ exports.getAllBooks = (function (req, res) {
         });
 });
 
-exports.getBookById = (function (id, req, res) {
-    bookDao.getBookById(id)
+exports.getBookById = (function (req, res) {
+    bookDao.getBookById(req.params.id)
         .then(function (result) {
             res.setHeader('Content-Type', 'application/json');
 /*             for (let i = 0; i < result.length; i++) {
@@ -80,6 +93,80 @@ exports.getBookById = (function (id, req, res) {
             throw err;
         });
 });
+
+exports.updateBook = (function(req,res) {
+    let book = req.body;
+
+    bookDao.updateBook(book, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Update Failed!');
+          }
+          res.status(204);
+          res.send('Update Successful!');
+    });
+});
+
+exports.createBook = async function createBookTransaction(req, res) {
+    let key = await createBookBase(req, res);
+    console.log('Outside Key: ' + key);
+    req.body.bookId = key;
+
+    // create book-author relationships
+    createBookAuthors(req, res);
+
+    // create book-genre relationships if genres are defined (optional)
+    //if (req.body.genres) {
+        createBookGenres(req, res);
+    //}
+
+    res.send('Create book transaction completed');
+};
+
+async function createBookBase(req, res) {
+    let book = req.body;
+
+    const dbObj = await bookDao.createBook(book);
+    return dbObj.insertId;
+}
+
+async function createBookAuthors(req,res) {
+    let book = req.body;
+    let x = -1;
+    let bookArray = [];
+
+    for (x in book.authors) {
+        bookArray = [book.bookId, book.authors[x].authorId];
+        bookDao.addBookAuthorRelationship(bookArray, function(err, result) {
+            if(err){
+                res.status(400);
+              }
+              res.status(204);
+        });
+        
+    }
+
+    /* res.send('Create book transaction completed'); */
+};
+
+async function createBookGenres(req,res) {
+    let book = req.body;
+    let x = -1;
+    let bookArray = [];
+
+    for (x in book.genres) {
+        bookArray = [book.genres[x].genreId, book.bookId];
+        bookDao.addBookGenreRelationship(bookArray, function(err, result) {
+            if(err){
+                res.status(400);
+              }
+              res.status(204);
+        });
+        
+    }
+
+    
+};
 
 exports.getAllPublishers = (function (req, res) {
     publisherDao.getAllPublishers()
@@ -115,6 +202,19 @@ exports.updatePublisher = (function(req,res) {
           }
           res.status(204);
           res.send('Update Successful!');
+    });
+});
+
+exports.createPublisher = (function(req,res) {
+    let publisher = req.body;
+
+    publisherDao.createPublisher(publisher, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Create Failed!');
+          }
+          res.status(204);
+          res.send('Create Successful!');
     });
 });
 
@@ -155,6 +255,19 @@ exports.updateGenre = (function(req,res) {
     });
 });
 
+exports.createGenre = (function(req,res) {
+    let genre = req.body;
+
+    genreDao.createGenre(genre, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Create Failed!');
+          }
+          res.status(204);
+          res.send('Create Successful!');
+    });
+});
+
 exports.getBorrowers = (function (req, res) {
     borrowerDao.getAllBorrowers()
         .then(function (result) {
@@ -189,6 +302,19 @@ exports.updateBorrower = (function(req,res) {
           }
           res.status(204);
           res.send('Update Successful!');
+    });
+});
+
+exports.createBorrower = (function(req,res) {
+    let borrower = req.body;
+
+    borrowerDao.createBorrower(borrower, function(err, result) {
+        if(err){
+            res.status(400);
+            res.send('Create Failed!');
+          }
+          res.status(204);
+          res.send('Create Successful!');
     });
 });
 
@@ -228,60 +354,15 @@ exports.updateBranch = (function(req,res) {
     });
 });
 
+exports.createBranch = (function(req,res) {
+    let branch = req.body;
 
-
-/* exports.getBranchByBranchId = (function(branchId,req, res) {
-    libraryBranchDao.getLibraryBranchById(branchId)
-        .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(result);
-        })
-        .catch(function (err) {
-            throw err;
-        });
-});
-
-exports.updateBranch = (function(branchId, branchName, branchAddress, req, res) {
-    console.log(branchAddress);
-    libraryBranchDao.updateLibraryBranch(branchId, branchName, branchAddress, function (error, result) {
-        if (error) {
+    branchDao.createBranch(branch, function(err, result) {
+        if(err){
             res.status(400);
-            res.send('Update Library Branch Failed!');
-        }
-        res.status(201);
-        res.send('Update Library Branch Successful!');
+            res.send('Create Failed!');
+          }
+          res.status(204);
+          res.send('Create Successful!');
     });
 });
-
-exports.getBookCopies = (function(branchId, req, res) {
-    bookCopiesDao.getBookCopiesByBranchId(branchId)
-        .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(result);
-        })
-        .catch(function (err) {
-            throw err;
-        });
-});
-
-exports.getBookCopy = (function(branchId, bookId, req, res) {
-    bookCopiesDao.getBookCopiesById(branchId, bookId)
-        .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(result);
-        })
-        .catch(function (err) {
-            throw err;
-        });
-});
-
-exports.updateBookCopyCount = (function(req, res) {
-    bookCopiesDao.updateNoOfBookCopies(bookCopy, branchId, bookId, function (error, result) {
-        if (error) {
-            res.status(400);
-            res.send('Update nunber of Book Copies Failed!');
-        }
-        res.status(201);
-        res.send('Update nunber of Book Copies Successful!');
-    });
-}); */

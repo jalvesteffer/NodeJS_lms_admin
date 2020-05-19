@@ -23,3 +23,11 @@ exports.updateAuthor = function (author, cb) {
     });
   });
 };
+
+exports.createAuthor = function (author, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [author.authorName], function (err, result) {
+      cb(err, result);
+    });
+  });
+};

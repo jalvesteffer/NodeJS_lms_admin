@@ -25,3 +25,11 @@ exports.updateGenre = function (genre, cb) {
     });
   });
 };
+
+exports.createGenre = function (genre, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_genre (genre_name) VALUES (?)', [genre.genre_name], function (err, result) {
+      cb(err, result);
+    });
+  });
+};
