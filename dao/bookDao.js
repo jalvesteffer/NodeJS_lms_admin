@@ -43,19 +43,35 @@ exports.updateBook = function (book, cb) {
   });
 };
 
-exports.createBook = function (book, cb) {
+exports.createBook = async function (book) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_book (title, pubId) ' +
-      'VALUES (?, ?)', [book.title, book.pubId], function (err, result) {
+    db.query(
+      'INSERT INTO tbl_book (title, pubId) VALUES (?, ?)',
+      [book.title, book.pubId],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
+exports.addBookAuthorRelationship = function (bookArray, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('INSERT INTO tbl_book_authors (bookId, authorId) ' +
+      'VALUES (?, ?)', [bookArray[0], bookArray[1]], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.addBookAuthorRelationship = function (book, cb) {
+exports.addBookGenreRelationship = function (bookArray, cb) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_book_authors (bookId, authorId) ' +
-      'VALUES (?, ?)', [book.bookId, book.author.authorId], function (err, result) {
+    db.query('INSERT INTO tbl_book_genres (genre_id, bookId) ' +
+      'VALUES (?, ?)', [bookArray[0], bookArray[1]], function (err, result) {
       cb(err, result);
     });
   });
