@@ -16,20 +16,20 @@ exports.getPublisherById = function (id) {
   });;
 };
 
-exports.updatePublisher = function (publisher, cb) {
+exports.updatePublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_publisher ' +
       'SET publisherName=?, publisherAddress=?, publisherPhone=? ' +
-      'WHERE publisherId=?', [publisher.publisherName, publisher.publisherAddress, publisher.publisherPhone, publisher.publisherId], function (err, result) {
+      'WHERE publisherId=?', [publisherName, publisherAddress, publisherPhone, publisherId], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.createPublisher = function (publisher, cb) {
+exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) ' +
-      'VALUES (?, ?, ?)', [publisher.publisherName, publisher.publisherAddress, publisher.publisherPhone], function (err, result) {
+      'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone, publisherId], function (err, result) {
       cb(err, result);
     });
   });

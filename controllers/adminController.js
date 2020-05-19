@@ -1,9 +1,13 @@
 
 var routes = require('express').Router();
+const bodyParse = require('body-parser');
+const xmlparser = require('express-xml-bodyparser');
+routes.use(xmlparser());
+routes.use(bodyParse.json());
 var adminService = require('../services/adminServices');
 
 routes.get('/lms/admin/authors', adminService.getAllAuthors);
-routes.get('/lms/admin/authors/:id', adminService.getAuthorById);
+routes.get('/lms/admin/authors', adminService.getAuthorById);
 routes.put('/lms/admin/authors', adminService.updateAuthor);
 routes.post('/lms/admin/authors', adminService.createAuthor);
 

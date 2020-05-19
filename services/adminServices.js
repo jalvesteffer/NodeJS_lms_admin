@@ -6,13 +6,24 @@ let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
 let key = -1;
+let xml2js = require('xml2js');
 
 exports.getAllAuthors = (function (req, res) {
     authorDao.getAllAuthors()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -22,9 +33,20 @@ exports.getAllAuthors = (function (req, res) {
 exports.getAuthorById = (function (req, res) {
     authorDao.getAuthorById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -32,11 +54,21 @@ exports.getAuthorById = (function (req, res) {
 });
 
 exports.updateAuthor = (function(req,res) {
-    let author = req.body;
-    let authorId = parseInt(req.body.authorId);
-    let authorName = req.body.authorName;
+    let body;
+    let authorId;
+    let authorName;
 
-    authorDao.updateAuthor(author, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        authorId = body.authorId;
+        authorName = body.authorName;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        authorId = body.authorid[0];
+        authorName = body.authorname[0];
+    }
+
+    authorDao.updateAuthor( authorName,  authorId, function(err, result) {
         if(err){
             res.status(400);
             res.send('Update Failed!');
@@ -47,9 +79,18 @@ exports.updateAuthor = (function(req,res) {
 });
 
 exports.createAuthor = (function(req,res) {
-    let author = req.body;
+    let body;
+    let authorName;
 
-    authorDao.createAuthor(author, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        authorName = body.authorName;
+
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        authorName = body.authorname[0];
+    }
+    authorDao.createAuthor(authorName, function(err, result) {
         if(err){
             res.status(400);
             res.send('Create Failed!');
@@ -62,9 +103,19 @@ exports.createAuthor = (function(req,res) {
 exports.getAllBooks = (function (req, res) {
     bookDao.getAllBooks()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -74,20 +125,20 @@ exports.getAllBooks = (function (req, res) {
 exports.getBookById = (function (req, res) {
     bookDao.getBookById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-/*             for (let i = 0; i < result.length; i++) {
-                let r = result[i];
-
-                publisherDao.getPublisherById(r.pubId)
-                .then(function (pubResult)  {
-                    console.log(pubResult.publisherName);
-                    r.pubId = pubResult.publisherName;
-                });
-                
-                console.log(r.pubId);
-            } */
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -171,9 +222,19 @@ async function createBookGenres(req,res) {
 exports.getAllPublishers = (function (req, res) {
     publisherDao.getAllPublishers()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -183,9 +244,20 @@ exports.getAllPublishers = (function (req, res) {
 exports.getPublisherById = (function (req, res) {
     publisherDao.getPublisherById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -193,9 +265,27 @@ exports.getPublisherById = (function (req, res) {
 });
 
 exports.updatePublisher = (function(req,res) {
-    let publisher = req.body;
+    let body;
+    let publisherId;
+    let publisherName;
+    let publisherAddress;
+    let publisherPhone;
 
-    publisherDao.updatePublisher(publisher, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        publisherId = body.publisherId;
+        publisherName = body.publisherName;
+        publisherAddress = body.publisherAddress;
+        publisherPhone = body.publisherPhone;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        publisherId = body.publisherid[0];
+        publisherName = body.publishername[0];
+        publisherAddress = body.publisheraddress[0];
+        publisherPhone = body.publisherphone[0];
+    }
+
+    publisherDao.updatePublisher(publisherName, publisherAddress, publisherPhone, publisherId, function(err, result) {
         if(err){
             res.status(400);
             res.send('Update Failed!');
@@ -206,9 +296,27 @@ exports.updatePublisher = (function(req,res) {
 });
 
 exports.createPublisher = (function(req,res) {
-    let publisher = req.body;
+    let body;
+    let publisherId;
+    let publisherName;
+    let publisherAddress;
+    let publisherPhone;
 
-    publisherDao.createPublisher(publisher, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        publisherId = body.publisherId;
+        publisherName = body.publisherName;
+        publisherAddress = body.publisherAddress;
+        publisherPhone = body.publisherPhone;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        publisherId = body.publisherid[0];
+        publisherName = body.publishername[0];
+        publisherAddress = body.publisheraddress[0];
+        publisherPhone = body.publisherphone[0];
+    }
+
+    publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone, publisherId, function(err, result) {
         if(err){
             res.status(400);
             res.send('Create Failed!');
@@ -221,9 +329,19 @@ exports.createPublisher = (function(req,res) {
 exports.getAllGenres = (function (req, res) {
     genreDao.getAllGenres()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -233,9 +351,20 @@ exports.getAllGenres = (function (req, res) {
 exports.getGenreById = (function (req, res) {
     genreDao.getGenreById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -243,9 +372,21 @@ exports.getGenreById = (function (req, res) {
 });
 
 exports.updateGenre = (function(req,res) {
-    let genre = req.body;
+    let body;
+    let genre_id;
+    let genre_name;
 
-    genreDao.updateGenre(genre, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        genre_id = body.genre_id;
+        genre_name = body.genre_name;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        genre_id = body.genre_id[0];
+        genre_name = body.genre_name[0];
+    }
+
+    genreDao.updateGenre(genre_name, genre_id, function(err, result) {
         if(err){
             res.status(400);
             res.send('Update Failed!');
@@ -256,9 +397,18 @@ exports.updateGenre = (function(req,res) {
 });
 
 exports.createGenre = (function(req,res) {
-    let genre = req.body;
+    let body;
+    let genre_name;
 
-    genreDao.createGenre(genre, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        genre_name = body.genre_name;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        genre_name = body.genre_name[0];
+    }
+
+    genreDao.createGenre(genre_name, function(err, result) {
         if(err){
             res.status(400);
             res.send('Create Failed!');
@@ -271,9 +421,19 @@ exports.createGenre = (function(req,res) {
 exports.getBorrowers = (function (req, res) {
     borrowerDao.getAllBorrowers()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -283,9 +443,20 @@ exports.getBorrowers = (function (req, res) {
 exports.getBorrowerById = (function (req, res) {
     borrowerDao.getBorrowerById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -293,9 +464,27 @@ exports.getBorrowerById = (function (req, res) {
 });
 
 exports.updateBorrower = (function(req,res) {
-    let borrower = req.body;
+    let body;
+    let name;
+    let address;
+    let phone;
+    let cardNo;
 
-    borrowerDao.updateBorrower(borrower, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        name = body.name;
+        address = body.address;
+        phone = body.phone;
+        cardNo = body.cardNo;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        name = body.name[0];
+        address = body.address[0];
+        phone = body.phone[0];
+        cardNo = body.cardno[0];
+    }
+
+    borrowerDao.updateBorrower(name, address, phone, cardNo, function(err, result) {
         if(err){
             res.status(400);
             res.send('Update Failed!');
@@ -306,9 +495,24 @@ exports.updateBorrower = (function(req,res) {
 });
 
 exports.createBorrower = (function(req,res) {
-    let borrower = req.body;
+    let body;
+    let name;
+    let address;
+    let phone;
 
-    borrowerDao.createBorrower(borrower, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        name = body.name;
+        address = body.address;
+        phone = body.phone;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        name = body.name[0];
+        address = body.address[0];
+        phone = body.phone[0];
+    }
+
+    borrowerDao.createBorrower(name, address, phone, function(err, result) {
         if(err){
             res.status(400);
             res.send('Create Failed!');
@@ -321,8 +525,19 @@ exports.createBorrower = (function(req,res) {
 exports.getBranches = (function (req, res) {
     branchDao.getAllBranches()
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(result);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -332,9 +547,20 @@ exports.getBranches = (function (req, res) {
 exports.getBranchById = (function (req, res) {
     branchDao.getBranchById(req.params.id)
         .then(function (result) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(result);
+            if (req.accepts('json') || req.accepts('text/html')) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200);
+                res.send(result);
+            } else if (req.accepts('application/xml')) {
+                let body = result[0];
+                res.setHeader('Content-Type', 'text/xml');
+                var builder = new xml2js.Builder();
+                var xml = builder.buildObject(body);
+                res.status(200);
+                res.send(xml);
+            } else {
+                res.send(406);
+            }
         })
         .catch(function (err) {
             throw err;
@@ -342,9 +568,24 @@ exports.getBranchById = (function (req, res) {
 });
 
 exports.updateBranch = (function(req,res) {
-    let branch = req.body;
+    let body;
+    let branchId;
+    let branchName;
+    let branchAddress;
 
-    branchDao.updateBranch(branch, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        branchId = body.branchId;
+        branchName = body.branchName;
+        branchAddress = body.branchAddress;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        branchId = body.branchId[0];
+        branchName = body.branchname[0];
+        branchAddress= body.branchaddress[0];
+    }
+
+    branchDao.updateBranch(branchName, branchAddress, branchId, function(err, result) {
         if(err){
             res.status(400);
             res.send('Update Failed!');
@@ -355,9 +596,24 @@ exports.updateBranch = (function(req,res) {
 });
 
 exports.createBranch = (function(req,res) {
-    let branch = req.body;
+    let body;
+    let branchId;
+    let branchName;
+    let branchAddress;
 
-    branchDao.createBranch(branch, function(err, result) {
+    if (req.is('application/json') == 'application/json' ) {
+        body = req.body;
+        branchId = body.branchId;
+        branchName = body.branchName;
+        branchAddress = body.branchAddress;
+    }else if (req.is('application/xml') == 'application/xml') {
+        body = req.body.root;
+        branchId = body.branchId[0];
+        branchName = body.branchname[0];
+        branchAddress= body.branchaddress[0];
+    }
+
+    branchDao.createBranch(branchName, branchAddress, branchId, function(err, result) {
         if(err){
             res.status(400);
             res.send('Create Failed!');

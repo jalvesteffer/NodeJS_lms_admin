@@ -16,20 +16,20 @@ exports.getBranchById = function (id) {
   });
 };
 
-exports.updateBranch = function (branch, cb) {
+exports.updateBranch = function (branchName, branchAddress, branchId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_library_branch ' +
       'SET branchName=?, branchAddress=? ' +
-      'WHERE branchId=?', [branch.branchName, branch.branchAddress, branch.branchId], function (err, result) {
+      'WHERE branchId=?', [branchName, branchAddress, branchId], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.createBranch = function (branch, cb) {
+exports.createBranch = function (branchName, branchAddress, branchId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_library_branch (branchName, branchAddress) ' +
-      'VALUES (?, ?)', [branch.branchName, branch.branchAddress], function (err, result) {
+      'VALUES (?, ?)', [branchName, branchAddress, branchId], function (err, result) {
       cb(err, result);
     });
   });
