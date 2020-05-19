@@ -33,3 +33,11 @@ exports.createBorrower = function (name, address, phone, cb) {
     });
   });
 };
+
+exports.deleteBorrower = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_borrower WHERE cardNo=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+}; 

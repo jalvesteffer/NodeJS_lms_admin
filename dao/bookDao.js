@@ -76,3 +76,28 @@ exports.addBookGenreRelationship = function (bookArray, cb) {
     });
   });
 };
+
+exports.deleteBook = function (id, cb) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_book WHERE bookId=?', [id], function (err, result) {
+      cb(err, result);
+    });
+  });
+};
+
+exports.deleteBooksByAuthorId = async function (id) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE b FROM tbl_book AS b INNER JOIN tbl_book_authors AS ba ON b.bookId=ba.bookId WHERE ba.authorId=?', 
+      [id], 
+      (err, result) => {
+        if (err) {
+          console.log("reject");
+          reject(err);
+        } else {
+          console.log("resolve id: " + id);
+          resolve(result);
+        }
+      } 
+    );
+  });
+}; 
