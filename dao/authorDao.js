@@ -16,17 +16,17 @@ exports.getAuthorById = function (id) {
   });;
 };
 
-exports.updateAuthor = function (author, cb) {
+exports.updateAuthor = function (authorName, authorId, cb) {
   return new Promise(function (resolve, reject) {
-    db.query('UPDATE library.tbl_author SET authorName=? WHERE authorId=?', [author.authorName, author.authorId], function (err, result) {
+    db.query('UPDATE library.tbl_author SET authorName=? WHERE authorId=?', [authorName, authorId], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.createAuthor = function (author, cb) {
+exports.createAuthor = function (authorName, cb) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [author.authorName], function (err, result) {
+    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], function (err, result) {
       cb(err, result);
     });
   });

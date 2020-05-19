@@ -16,19 +16,19 @@ exports.getBorrowerById = function (id) {
   });;
 };
 
-exports.updateBorrower = function (borrower, cb) {
+exports.updateBorrower = function (name, address, phone, cardNo, cb) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_borrower ' +
       'SET name=?, address=?, phone=? ' +
-      'WHERE cardNo=?', [borrower.name, borrower.address, borrower.phone, borrower.cardNo], function (err, result) {
+      'WHERE cardNo=?', [name, address, phone, cardNo], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.createBorrower = function (borrower, cb) {
+exports.createBorrower = function (name, address, phone, cb) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [borrower.name, borrower.address, borrower.phone], function (err, result) {
+    db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [name, address, phone], function (err, result) {
       cb(err, result);
     });
   });

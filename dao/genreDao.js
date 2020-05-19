@@ -16,19 +16,19 @@ exports.getGenreById = function (id) {
   });;
 };
 
-exports.updateGenre = function (genre, cb) {
+exports.updateGenre = function (genre_name, genre_id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_genre ' +
       'SET genre_name=? ' +
-      'WHERE genre_id=?', [genre.genre_name, genre.genre_id], function (err, result) {
+      'WHERE genre_id=?', [genre_name, genre_id], function (err, result) {
       cb(err, result);
     });
   });
 };
 
-exports.createGenre = function (genre, cb) {
+exports.createGenre = function (genre_name, cb) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_genre (genre_name) VALUES (?)', [genre.genre_name], function (err, result) {
+    db.query('INSERT INTO tbl_genre (genre_name) VALUES (?)', [genre_name], function (err, result) {
       cb(err, result);
     });
   });
