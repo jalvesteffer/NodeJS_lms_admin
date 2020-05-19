@@ -7,25 +7,35 @@ let branchDao = require('../dao/branchDao');
 let bookLoansDao = require('../dao/bookLoansDao');
 let xml2js = require('xml2js');
 
+/* 
+This method returns the list of all authors
+*/
 exports.getAllAuthors = (function (req, res) {
     authorDao.getAllAuthors()
+        // query success, process results
         .then(function (result) {
+            // send results as json
             if (req.accepts('json') || req.accepts('text/html')) {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200);
                 res.send(result);
-            } else if (req.accepts('application/xml')) {
+            } 
+            // send results as xml if requested
+            else if (req.accepts('application/xml')) {
                 res.setHeader('Content-Type', 'text/xml');
                 var builder = new xml2js.Builder();
                 var xml = builder.buildObject(result);
                 res.status(200);
                 res.send(xml);
-            } else {
+            } 
+            // content negotiation failure
+            else {
                 res.send(406);
             }
         })
+        // query failure
         .catch(function (err) {
-            throw err;
+            console.log('getAllAuthors query failed');
         });
 });
 
