@@ -59,16 +59,38 @@ exports.createAuthor = (function(req,res) {
     });
 });
 
-exports.deleteAuthor = (function(req,res) {
-    authorDao.deleteAuthor(req.params.id, function(err, result) {
+exports.deleteAuthor = async function deleteAuthorTransaction(req,res) {
+    console.log("Before func call");
+    await deleteBooksByAuthorId(req, res);
+    console.log("After func call");
+
+    await authorDao.deleteAuthor(req.params.id, function(err, result) {
         if(err){
             res.status(400);
             res.send('Delete Failed!');
-          }
-          res.status(200);
-          res.send('Delete Successful!');
+        }    
+        res.status(200);
+        
     });
-});
+    /* console.log("Before func call");
+    deleteBooksByAuthorId(req, res);
+    console.log("After func call"); */
+
+    res.send('Delete Successful!');
+};
+
+async function deleteBooksByAuthorId(req, res) {
+    console.log("Before deletBooksByAuthorId, Author ID: " + req.params.id);
+    await bookDao.deleteBooksByAuthorId(req.params.id, function(err, result) {
+        if(err){
+            console.log("Error");
+            res.status(400);
+        }
+        console.log("Success");
+        res.status(204);
+        console.log("After deletBooksByAuthorId");
+    });
+}
 
 exports.getAllBooks = (function (req, res) {
     bookDao.getAllBooks()
