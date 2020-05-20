@@ -44,22 +44,23 @@ exports.createAuthor = function (authorName, cb) {
   });
 };
 
-exports.deleteAuthor = function (authorId) {
+/* 
+This query deletes a specified author by id
+*/
+exports.deleteAuthor = function (authorId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_author ' +
       'WHERE authorId=?',
       [authorId],
       (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      }
-    );
+        cb(err, result);
+      });
   });
 };
 
+/* 
+This query deletes all books by by an author's id
+*/
 exports.deleteBooksByAuthorId = async function (id) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_book WHERE bookId IN ' +

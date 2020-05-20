@@ -36,6 +36,9 @@ exports.updateBorrower = function (name, address, phone, cardNo, cb) {
   });
 };
 
+/* 
+This query creates a new borrower
+*/
 exports.createBorrower = function (name, address, phone, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [name, address, phone], function (err, result) {
@@ -44,6 +47,9 @@ exports.createBorrower = function (name, address, phone, cb) {
   });
 };
 
+/* 
+This query deletes a specified borrower by id
+*/
 exports.deleteBorrower = function (cardNo, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_borrower WHERE cardNo=?', [cardNo], function (err, result) {

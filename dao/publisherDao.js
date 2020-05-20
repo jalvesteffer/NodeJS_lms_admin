@@ -36,16 +36,22 @@ exports.updatePublisher = function (publisherName, publisherAddress, publisherPh
   });
 };
 
-exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
+/* 
+This query creates a new publisher
+*/
+exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) ' +
-      'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone, publisherId],
+      'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone],
       function (err, result) {
         cb(err, result);
       });
   });
 };
 
+/* 
+This query deletes a specified publisher by id
+*/
 exports.deletePublisher = function (id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_publisher WHERE PublisherId=?', [id], function (err, result) {

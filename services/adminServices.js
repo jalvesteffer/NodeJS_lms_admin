@@ -166,39 +166,53 @@ exports.createAuthor = (function (req, res) {
         }
         // create successful 
         else {
-            res.status(204);
-            res.send('Update Successful!');
+            res.status(201);
+            res.send('Create Successful!');
         }
     });
 });
 
+/* 
+This method deletes a specified author by id
+*/
 exports.deleteAuthor = async function deleteAuthorTransaction(req, res) {
-    console.log("Before func call");
-    await deleteBooksByAuthorId(req, res);
-    console.log("After func call");
 
+    // make sure id provided matches an existing record
+    let result = await authorDao.getAuthorById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete all books by author id first for referential integrity in DB
+    await deleteBooksByAuthorId(req, res);
+
+    // delete the record
     await authorDao.deleteAuthor(req.params.id, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Delete Failed!');
         }
-        res.status(200);
-
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
     });
-
-    res.send('Delete Successful!');
 };
 
+/* 
+This method deletes all books by by an author's id
+*/
 async function deleteBooksByAuthorId(req, res) {
-    console.log("Before deletBooksByAuthorId, Author ID: " + req.params.id);
     await bookDao.deleteBooksByAuthorId(req.params.id, function (err, result) {
         if (err) {
-            console.log("Error");
             res.status(400);
+        } else {
+            res.status(204);
         }
-        console.log("Success");
-        res.status(204);
-        console.log("After deletBooksByAuthorId");
     });
 }
 
@@ -327,22 +341,34 @@ exports.updateBook = (async function (req, res) {
     });
 });
 
+/* 
+This method creates a new book transaction
+*/
 exports.createBook = async function createBookTransaction(req, res) {
+    // error if need update values not provided
+    if (!req.body.title || !req.body.pubId || !req.body.authors || !req.body.genres) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // create new record in book table and get its key
     let key = await createBookBase(req, res);
-    console.log('Outside Key: ' + key);
     req.body.bookId = key;
 
     // create book-author relationships
     createBookAuthors(req, res);
 
     // create book-genre relationships if genres are defined (optional)
-    //if (req.body.genres) {
     createBookGenres(req, res);
-    //}
 
+    res.status(201);
     res.send('Create book transaction completed');
 };
 
+/* 
+This method a new record in the book table and returns its key
+*/
 async function createBookBase(req, res) {
     let book = req.body;
 
@@ -350,51 +376,75 @@ async function createBookBase(req, res) {
     return dbObj.insertId;
 }
 
+/* 
+This method creates new book/author relationships to populate a books authors list
+*/
 async function createBookAuthors(req, res) {
     let book = req.body;
     let x = -1;
     let bookArray = [];
 
+    // for each author in book, create relationship
     for (x in book.authors) {
         bookArray = [book.bookId, book.authors[x].authorId];
         bookDao.addBookAuthorRelationship(bookArray, function (err, result) {
             if (err) {
                 res.status(400);
+            } else {
+                res.status(201);
             }
-            res.status(204);
         });
-
     }
-
-    /* res.send('Create book transaction completed'); */
 };
 
-exports.deleteBook = (function (req, res) {
-    bookDao.deleteBook(req.params.id, function (err, result) {
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        res.status(200);
-        res.send('Delete Successful!');
-    });
-});
-
+/* 
+This method creates new book/genre relationships to populate a books genres list
+*/
 async function createBookGenres(req, res) {
     let book = req.body;
     let x = -1;
     let bookArray = [];
 
+    // for each genre in book, create relationship
     for (x in book.genres) {
         bookArray = [book.genres[x].genreId, book.bookId];
         bookDao.addBookGenreRelationship(bookArray, function (err, result) {
             if (err) {
                 res.status(400);
+            } else {
+                res.status(201);
             }
-            res.status(204);
         });
     }
 };
+
+/* 
+This method deletes a specified book by id
+*/
+exports.deleteBook = (async function (req, res) {
+
+    // make sure id provided matches an existing record
+    let result = await bookDao.getBookById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete the record
+    bookDao.deleteBook(req.params.id, function (err, result) {
+        // error with query
+        if (err) {
+            res.status(400);
+            res.send('Delete Failed!');
+        }
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
+    });
+});
 
 /* 
 This method returns the list of all publishers
@@ -526,45 +576,77 @@ exports.updatePublisher = (async function (req, res) {
     });
 });
 
+/* 
+This method creates a new publisher
+*/
 exports.createPublisher = (function (req, res) {
-    let body;
-    let publisherId;
-    let publisherName;
-    let publisherAddress;
-    let publisherPhone;
+    let body; // payload of post request
+    let publisherName; // new publisher name
+    let publisherAddress; // new publisher address
+    let publisherPhone; // new publisher phone
 
+    // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
-        publisherId = body.publisherId;
         publisherName = body.publisherName;
         publisherAddress = body.publisherAddress;
         publisherPhone = body.publisherPhone;
-    } else if (req.is('application/xml') == 'application/xml') {
+    }
+    // prepare payload in xml format
+    else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
-        publisherId = body.publisherid[0];
         publisherName = body.publishername[0];
         publisherAddress = body.publisheraddress[0];
         publisherPhone = body.publisherphone[0];
     }
 
-    publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone, publisherId, function (err, result) {
+    // error if need update values not provided
+    if (!publisherName || !publisherAddress || !publisherPhone) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // create the record
+    publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Create Failed!');
         }
-        res.status(204);
-        res.send('Create Successful!');
+        // create successful 
+        else {
+            res.status(201);
+            res.send('Create Successful!');
+        }
     });
 });
 
-exports.deletePublisher = (function (req, res) {
+/* 
+This method deletes a specified publisher by id
+*/
+exports.deletePublisher = (async function (req, res) {
+
+    // make sure id provided matches an existing record
+    let result = await publisherDao.getPublisherById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete the record
     publisherDao.deletePublisher(req.params.id, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Delete Failed!');
         }
-        res.status(200);
-        res.send('Delete Successful!');
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
     });
 });
 
@@ -692,36 +774,71 @@ exports.updateGenre = (async function (req, res) {
     });
 });
 
+/* 
+This method updates genre information
+*/
 exports.createGenre = (function (req, res) {
-    let body;
-    let genre_name;
+    let body; // payload of post request
+    let genre_name; // new genre name
 
+    // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         genre_name = body.genre_name;
-    } else if (req.is('application/xml') == 'application/xml') {
+    }
+    // prepare payload in xml format
+    else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         genre_name = body.genre_name[0];
     }
 
+    // error if need update values not provided
+    if (!genre_name) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // create the record
     genreDao.createGenre(genre_name, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Create Failed!');
         }
-        res.status(204);
-        res.send('Create Successful!');
+        // create successful 
+        else {
+            res.status(201);
+            res.send('Create Successful!');
+        }
     });
 });
 
-exports.deleteGenre = (function (req, res) {
+/* 
+This method deletes a specified genre by id
+*/
+exports.deleteGenre = (async function (req, res) {
+
+    // make sure id provided matches an existing record
+    let result = await genreDao.getGenreById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete the record
     genreDao.deleteGenre(req.params.id, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Delete Failed!');
         }
-        res.status(200);
-        res.send('Delete Successful!');
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
     });
 });
 
@@ -855,42 +972,76 @@ exports.updateBorrower = (async function (req, res) {
     });
 });
 
+/* 
+This method creates a new borrower
+*/
 exports.createBorrower = (function (req, res) {
-    let body;
-    let name;
-    let address;
-    let phone;
+    let body; // payload of post request
+    let name; // new borrower name
+    let address; // new address
+    let phone; // new phone
 
+    // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         name = body.name;
         address = body.address;
         phone = body.phone;
-    } else if (req.is('application/xml') == 'application/xml') {
+    }
+    // prepare payload in xml format
+    else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         name = body.name[0];
         address = body.address[0];
         phone = body.phone[0];
     }
 
+    // error if need update values not provided
+    if (!name || !address || !phone) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // create the record
     borrowerDao.createBorrower(name, address, phone, function (err, result) {
         if (err) {
             res.status(400);
             res.send('Create Failed!');
         }
-        res.status(204);
-        res.send('Create Successful!');
+        // create successful 
+        else {
+            res.status(201);
+            res.send('Create Successful!');
+        }
     });
 });
 
-exports.deleteBorrower = (function (req, res) {
+/* 
+This method deletes a specified borrower by id
+*/
+exports.deleteBorrower = (async function (req, res) {
+
+    // make sure id provided matches an existing record
+    let result = await borrowerDao.getBorrowerById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete the record
     borrowerDao.deleteBorrower(req.params.id, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Delete Failed!');
         }
-        res.status(200);
-        res.send('Delete Successful!');
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
     });
 });
 
@@ -1057,20 +1208,37 @@ exports.createBranch = (function (req, res) {
         }
         // create successful 
         else {
-            res.status(204);
-            res.send('Update Successful!');
+            res.status(201);
+            res.send('Create Successful!');
         }
     });
 });
 
-exports.deleteBranch = (function (req, res) {
+/* 
+This method deletes a specified branch by id
+*/
+exports.deleteBranch = (async function (req, res) {
+
+    // make sure id provided matches an existing record
+    let result = await branchDao.getBranchById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
+        return;
+    }
+
+    // delete the record
     branchDao.deleteBranch(req.params.id, function (err, result) {
+        // error with query
         if (err) {
             res.status(400);
             res.send('Delete Failed!');
         }
-        res.status(200);
-        res.send('Delete Successful!');
+        // delete successful
+        else {
+            res.status(204);
+            res.send('Delete Successful!');
+        }
     });
 });
 

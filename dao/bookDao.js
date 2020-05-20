@@ -55,6 +55,9 @@ exports.updateBook = function (bookId, title, pubId, cb) {
   });
 };
 
+/* 
+This query creates a new book transaction
+*/
 exports.createBook = async function (book) {
   return new Promise(function (resolve, reject) {
     db.query(
@@ -71,6 +74,9 @@ exports.createBook = async function (book) {
   });
 };
 
+/* 
+This query creates new book/author relationships to populate a books authors list
+*/
 exports.addBookAuthorRelationship = function (bookArray, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_book_authors (bookId, authorId) ' +
@@ -81,6 +87,9 @@ exports.addBookAuthorRelationship = function (bookArray, cb) {
   });
 };
 
+/* 
+This query creates new book/genre relationships to populate a books genres list
+*/
 exports.addBookGenreRelationship = function (bookArray, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_book_genres (genre_id, bookId) ' +
@@ -91,6 +100,9 @@ exports.addBookGenreRelationship = function (bookArray, cb) {
   });
 };
 
+/* 
+This query deletes a specified book by id
+*/
 exports.deleteBook = function (id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_book WHERE bookId=?', [id], function (err, result) {
@@ -99,16 +111,17 @@ exports.deleteBook = function (id, cb) {
   });
 };
 
+/* 
+This query deletes all books by by an author's id
+*/
 exports.deleteBooksByAuthorId = async function (id) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE b FROM tbl_book AS b INNER JOIN tbl_book_authors AS ba ON b.bookId=ba.bookId WHERE ba.authorId=?',
       [id],
       (err, result) => {
         if (err) {
-          console.log("reject");
           reject(err);
         } else {
-          console.log("resolve id: " + id);
           resolve(result);
         }
       }

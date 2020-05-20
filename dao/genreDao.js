@@ -36,6 +36,9 @@ exports.updateGenre = function (genre_name, genre_id, cb) {
   });
 };
 
+/* 
+This query updates borrower information
+*/
 exports.createGenre = function (genre_name, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_genre (genre_name) VALUES (?)', [genre_name], function (err, result) {
@@ -44,6 +47,9 @@ exports.createGenre = function (genre_name, cb) {
   });
 };
 
+/* 
+This query deletes a specified genre by id
+*/
 exports.deleteGenre = function (genre_id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_genre WHERE genre_id=?', [genre_id], function (err, result) {

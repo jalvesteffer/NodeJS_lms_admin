@@ -1,40 +1,27 @@
 /* 
-This method creates a new author
+This method deletes a specified branch by id
 */
-exports.createAuthor = (function (req, res) {
-    let body; // payload of post request
-    let authorName; // new author name
+exports.deleteBranch = (async function (req, res) {
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        authorName = body.authorName;
-
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        authorName = body.authorname[0];
-    }
-
-    // error if need update values not provided
-    if (!authorName || !authorName || !authorName) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
+    // make sure id provided matches an existing record
+    let result = await branchDao.getBranchById(req.params.id);
+    if (result.length == 0) {
+        res.status(404);
+        res.send('ID provided does not match any existing records');
         return;
     }
 
-    // create the record
-    authorDao.createAuthor(authorName, function (err, result) {
+    // delete the record
+    branchDao.deleteBranch(req.params.id, function (err, result) {
         // error with query
         if (err) {
             res.status(400);
-            res.send('Create Failed!');
+            res.send('Delete Failed!');
         }
-        // create successful 
+        // delete successful
         else {
             res.status(204);
-            res.send('Update Successful!');
+            res.send('Delete Successful!');
         }
     });
 });

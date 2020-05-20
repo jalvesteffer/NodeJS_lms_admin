@@ -36,6 +36,9 @@ exports.updateBranch = function (branchName, branchAddress, branchId, cb) {
   });
 };
 
+/* 
+This query creates a new branch
+*/
 exports.createBranch = function (branchName, branchAddress, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_library_branch (branchName, branchAddress) ' +
@@ -46,6 +49,9 @@ exports.createBranch = function (branchName, branchAddress, cb) {
   });
 };
 
+/* 
+This query deletes a specified branch by id
+*/
 exports.deleteBranch = function (id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_library_branch WHERE branchId=?', [id], function (err, result) {
