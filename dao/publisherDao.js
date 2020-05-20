@@ -1,5 +1,8 @@
 var db = require('../db');
 
+/* 
+This query returns the list of all publishers
+*/
 exports.getAllPublishers = function () {
   return new Promise(function (resolve, reject) {
     db.query('SELECT * FROM library.tbl_publisher', function (err, result) {
@@ -8,6 +11,9 @@ exports.getAllPublishers = function () {
   });;
 };
 
+/* 
+This query returns a publisher by id
+*/
 exports.getPublisherById = function (id) {
   return new Promise(function (resolve, reject) {
     db.query('SELECT * FROM library.tbl_publisher WHERE publisherId=?', [id], function (err, result) {
@@ -16,30 +22,40 @@ exports.getPublisherById = function (id) {
   });;
 };
 
+/* 
+This query updates publisher information
+*/
 exports.updatePublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_publisher ' +
       'SET publisherName=?, publisherAddress=?, publisherPhone=? ' +
-      'WHERE publisherId=?', [publisherName, publisherAddress, publisherPhone, publisherId], function (err, result) {
-      cb(err, result);
-    });
+      'WHERE publisherId=?', [publisherName, publisherAddress, publisherPhone, publisherId],
+      function (err, result) {
+        cb(err, result);
+      });
   });
 };
 
-exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
+/* 
+This query creates a new publisher
+*/
+exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, cb) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) ' +
-      'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone, publisherId], function (err, result) {
-      cb(err, result);
-    });
+      'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone],
+      function (err, result) {
+        cb(err, result);
+      });
   });
 };
 
+/* 
+This query deletes a specified publisher by id
+*/
 exports.deletePublisher = function (id, cb) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_publisher WHERE PublisherId=?', [id], function (err, result) {
       cb(err, result);
     });
   });
-}; 
-
+};
