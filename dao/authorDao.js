@@ -37,10 +37,8 @@ exports.updateAuthor = function (authorName, authorId, cb) {
 This query creates a new author
 */
 exports.createAuthor = function (authorName, cb) {
-  return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], function (err, result) {
-      cb(err, result);
-    });
+  db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], function (err, result) {
+    cb(err, result);
   });
 };
 
