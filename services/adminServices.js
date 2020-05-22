@@ -164,7 +164,6 @@ exports.createAuthor = (function (req, res) {
             res.status(400);
             res.send('Create Failed!');
         }
-        e
         // create successful 
         else {
             res.status(201);
