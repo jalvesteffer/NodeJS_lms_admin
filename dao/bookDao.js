@@ -35,9 +35,29 @@ exports.getBookById = function (id) {
       'WHERE b.bookId = ? ' +
       'GROUP BY bookId ', [id],
       function (err, result) {
-
         return err ? reject(err) : resolve(result);
       });
+  });
+};
+
+/* 
+This query returns all books by an author id
+*/
+exports.getBooksByAuthorId = async function (id) {
+  return new Promise(function (resolve, reject) {
+
+    db.query('SELECT b.bookId, b.title ' +
+      'FROM library.tbl_book b ' +
+      'INNER JOIN library.tbl_book_authors ba ON b.bookId = ba.bookId ' +
+      'INNER JOIN library.tbl_author a ON a.authorId = ba.authorId WHERE a.authorId=?', [id],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
   });
 };
 

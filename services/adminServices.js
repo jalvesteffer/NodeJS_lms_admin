@@ -5,39 +5,28 @@ let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
 let bookLoansDao = require('../dao/bookLoansDao');
-let xml2js = require('xml2js');
 
 /* 
 This method returns the list of all authors
 */
-exports.getAllAuthors = (function (req, res) {
-    authorDao.getAllAuthors()
-        // query success, process results
-        .then(function (result) {
-            // send results as json
-            if (req.accepts('json') || req.accepts('text/html')) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
-                res.send(result);
+exports.getAllAuthors = (async function (req, res) {
+    try {
+        // get all authors
+        result = await authorDao.getAllAuthors();
+
+        // for each author, get the books the author wrote
+        for (author of result) {
+            booksResult = await bookDao.getBooksByAuthorId(author.authorId);
+            if (booksResult && booksResult.length > 0) {
+                author.books = booksResult;
             }
-            // send results as xml if requested
-            else if (req.accepts('application/xml')) {
-                res.setHeader('Content-Type', 'text/xml');
-                var builder = new xml2js.Builder();
-                var xml = builder.buildObject(result);
-                res.status(200);
-                res.send(xml);
-            }
-            // content negotiation failure
-            else {
-                res.send(406);
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAllAuthors query failed');
-            res.send(400);
-        });
+        }
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+
 });
 
 /* 
@@ -177,8 +166,11 @@ This method deletes a specified author by id
 */
 exports.deleteAuthor = async function deleteAuthorTransaction(req, res) {
 
+    //req.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+
     // make sure id provided matches an existing record
     let result = await authorDao.getAuthorById(req.params.id);
+
     if (result.length == 0) {
         res.status(404);
         res.send('ID provided does not match any existing records');
