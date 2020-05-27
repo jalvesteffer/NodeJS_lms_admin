@@ -5,6 +5,16 @@ This query returns the list of all authors
 */
 exports.getAllBooks = function () {
   return new Promise(function (resolve, reject) {
+    db.query('SELECT * ' +
+      'FROM library.tbl_book',
+      function (err, result) {
+        return err ? reject(err) : resolve(result);
+      });
+  });
+};
+
+/* exports.getAllBooks = function () {
+  return new Promise(function (resolve, reject) {
     db.query('SELECT ba.bookId, b.title, GROUP_CONCAT(Distinct a.authorName SEPARATOR \', \') AS authors, p.publisherName AS publisher, GROUP_CONCAT( Distinct g.genre_name SEPARATOR \', \') AS genres ' +
       'FROM library.tbl_author a ' +
       'INNER JOIN library.tbl_book_authors ba ON a.authorId = ba.authorId ' +
@@ -17,7 +27,7 @@ exports.getAllBooks = function () {
         return err ? reject(err) : resolve(result);
       });
   });
-};
+}; */
 
 /* 
 This query returns a book by id
@@ -50,6 +60,27 @@ exports.getBooksByAuthorId = async function (id) {
       'FROM library.tbl_book b ' +
       'INNER JOIN library.tbl_book_authors ba ON b.bookId = ba.bookId ' +
       'INNER JOIN library.tbl_author a ON a.authorId = ba.authorId WHERE a.authorId=?', [id],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
+/* 
+This query returns all books by an author id
+*/
+exports.getBooksByGenreId = async function (id) {
+  return new Promise(function (resolve, reject) {
+
+    db.query('SELECT b.bookId, b.title ' +
+      'FROM library.tbl_book b ' +
+      'INNER JOIN library.tbl_book_genres bg ON b.bookId = bg.bookId ' +
+      'INNER JOIN library.tbl_genre g ON g.genre_id = bg.genre_id WHERE g.genre_id=?', [id],
       (err, result) => {
         if (err) {
           reject(err);
@@ -104,6 +135,42 @@ exports.addBookAuthorRelationship = function (bookArray, cb) {
       function (err, result) {
         cb(err, result);
       });
+  });
+};
+
+/* 
+This query removes book/author relationships by author id
+*/
+exports.removeBookAuthorRelationshipsByAuthorId = function (id) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_book_authors ' +
+      'WHERE authorId=?', [id],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
+/* 
+This query removes book/author relationships by author id
+*/
+exports.removeBookGenreRelationshipsByGenreId = async function (id) {
+  return new Promise(function (resolve, reject) {
+    db.query('DELETE FROM tbl_book_genres ' +
+      'WHERE genre_id=?', [id],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
   });
 };
 

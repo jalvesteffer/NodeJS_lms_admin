@@ -32,41 +32,28 @@ exports.getAllAuthors = (async function (req, res) {
 /* 
 This method returns an author by id
 */
-exports.getAuthorById = (function (req, res) {
-    authorDao.getAuthorById(req.params.id)
-        // query success, process results
-        .then(function (result) {
-            // if result is empty, author by id not found
-            if (result.length == 0) {
-                res.status(404);
-                res.send("No matching author found");
-            } else {
-                // send results as json
-                if (req.accepts('json') || req.accepts('text/html')) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.status(200);
-                    res.send(result);
-                }
-                // send results as xml if requested
-                else if (req.accepts('application/xml')) {
-                    let body = result[0];
-                    res.setHeader('Content-Type', 'text/xml');
-                    var builder = new xml2js.Builder();
-                    var xml = builder.buildObject(body);
-                    res.status(200);
-                    res.send(xml);
-                }
-                // content negotiation failure
-                else {
-                    res.send(406);
-                }
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAuthorById query failed');
-            res.send(400);
-        });
+exports.getAuthorById = (async function (req, res) {
+    try {
+        // get all authors
+        result = await authorDao.getAuthorById(req.params.id);
+
+        // if result is empty, author by id not found
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
+
+        // for author, get the books the author wrote
+        booksResult = await bookDao.getBooksByAuthorId(req.params.id);
+        if (booksResult && booksResult.length > 0) {
+            result[0].books = booksResult;
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -76,89 +63,101 @@ exports.updateAuthor = (async function (req, res) {
     let body; // payload of put request
     let authorId; // id of author to update
     let authorName; // new author name
+    let books; // books written by author
 
     // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         authorId = body.authorId;
         authorName = body.authorName;
+        books = body.books;
     }
     // prepare payload in xml format
     else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         authorId = body.authorid[0];
         authorName = body.authorname[0];
+        books = body.books[0];
     }
 
-    // error if need update values not provided
-    if (!authorId || !authorName) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
+    // if request specifies books...
+    if (books) {
+        // remove existing books/author relationships
+        await bookDao.removeBookAuthorRelationshipsByAuthorId(authorId);
+
+        // create new book-author relationships
+        await createAuthorBooks(req, res);
     }
 
-    // make sure id provided matches an existing record
-    let result = await authorDao.getAuthorById(authorId);
-    if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
-        return;
-    }
+    try {
+        // update the record
+        result = await authorDao.updateAuthor(authorName, authorId);
 
-    // update the record
-    authorDao.updateAuthor(authorName, authorId, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Update Failed!');
-        }
-        // update successful 
-        else {
-            res.status(204);
-            res.send('Update Successful!');
-        }
-    });
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
+
+/* 
+This method creates new book/author relationships to populate a books authors list
+*/
+async function createAuthorBooks(req, res) {
+    let bookList = req.body.books;
+    let bookArray = [];
+
+    // for each author in book, create relationship
+    for (let x = 0; x < bookList.length; x++) {
+        bookArray = [bookList[x].bookId, req.body.authorId];
+
+        bookDao.addBookAuthorRelationship(bookArray, function (err, result) {
+            if (err) {
+                res.status(400);
+            } else {
+                res.status(201);
+            }
+        });
+    }
+};
 
 /* 
 This method creates a new author
 */
-exports.createAuthor = (function (req, res) {
+exports.createAuthor = (async function (req, res) {
     let body; // payload of post request
     let authorName; // new author name
+    let books; // books written by author
 
     // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         authorName = body.authorName;
-
+        books = body.books;
     }
     // prepare payload in xml format
     else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         authorName = body.authorname[0];
+        books = body.books[0];
     }
 
-    // error if need update values not provided
-    if (!authorName) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // update the record
+        const dbObj = await authorDao.createAuthor(authorName);
+        req.body.authorId = dbObj.insertId;
 
-    // create the record
-    authorDao.createAuthor(authorName, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Create Failed!');
+        // if request specifies books...
+        if (books) {
+            // create new book-author relationships
+            await createAuthorBooks(req, res);
         }
-        // create successful 
-        else {
-            res.status(201);
-            res.send('Create Successful!');
-        }
-    });
+
+        res.querySuccess = true;
+        res.queryResults = dbObj;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -166,33 +165,23 @@ This method deletes a specified author by id
 */
 exports.deleteAuthor = async function deleteAuthorTransaction(req, res) {
 
-    //req.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-
     // make sure id provided matches an existing record
     let result = await authorDao.getAuthorById(req.params.id);
 
     if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
+        res.querySuccess = false;
         return;
     }
 
-    // delete all books by author id first for referential integrity in DB
-    await deleteBooksByAuthorId(req, res);
+    try {
+        // delete the record
+        result = await authorDao.deleteAuthor(req.params.id);
 
-    // delete the record
-    await authorDao.deleteAuthor(req.params.id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        // delete successful
-        else {
-            res.status(204);
-            res.send('Delete Successful!');
-        }
-    });
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 };
 
 /* 
@@ -645,74 +634,52 @@ exports.deletePublisher = (async function (req, res) {
 /* 
 This method returns the list of all genres
 */
-exports.getAllGenres = (function (req, res) {
-    genreDao.getAllGenres()
-        // query success, process results
-        .then(function (result) {
-            // send results as json
-            if (req.accepts('json') || req.accepts('text/html')) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
-                res.send(result);
+exports.getAllGenres = (async function (req, res) {
+
+    try {
+        // get all genres
+        result = await genreDao.getAllGenres();
+
+        // for each genre, get the books associated with it
+        for (genre of result) {
+            booksResult = await bookDao.getBooksByGenreId(genre.genre_id);
+            if (booksResult && booksResult.length > 0) {
+                genre.books = booksResult;
             }
-            // send results as xml if requested
-            else if (req.accepts('application/xml')) {
-                res.setHeader('Content-Type', 'text/xml');
-                var builder = new xml2js.Builder();
-                var xml = builder.buildObject(result);
-                res.status(200);
-                res.send(xml);
-            }
-            // content negotiation failure
-            else {
-                res.send(406);
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAllGenres query failed');
-            res.send(400);
-        });
+        }
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+
 });
 
 /* 
 This method returns a genre by id
 */
-exports.getGenreById = (function (req, res) {
-    genreDao.getGenreById(req.params.id)
-        // query success, process results
-        .then(function (result) {
-            // if result is empty, genre by id not found
-            if (result.length == 0) {
-                res.status(404);
-                res.send("No matching author found");
-            } else {
-                // send results as json
-                if (req.accepts('json') || req.accepts('text/html')) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.status(200);
-                    res.send(result);
-                }
-                // send results as xml if requested
-                else if (req.accepts('application/xml')) {
-                    let body = result[0];
-                    res.setHeader('Content-Type', 'text/xml');
-                    var builder = new xml2js.Builder();
-                    var xml = builder.buildObject(body);
-                    res.status(200);
-                    res.send(xml);
-                }
-                // content negotiation failure
-                else {
-                    res.send(406);
-                }
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getGenreById query failed');
-            res.send(400);
-        });
+exports.getGenreById = (async function (req, res) {
+    try {
+        // get all authors
+        result = await genreDao.getGenreById(req.params.id);
+
+        // if result is empty, author by id not found
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
+
+        // for genre, get the books the genre is associated with
+        booksResult = await bookDao.getBooksByGenreId(req.params.id);
+        if (booksResult && booksResult.length > 0) {
+            result[0].books = booksResult;
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -722,88 +689,109 @@ exports.updateGenre = (async function (req, res) {
     let body; // payload of put request
     let genre_id; // id of genre to update
     let genre_name; // new genre name
+    let books; // books written by author
 
     // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         genre_id = body.genre_id;
         genre_name = body.genre_name;
+        books = body.books;
     }
     // prepare payload in xml format
     else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         genre_id = body.genre_id[0];
         genre_name = body.genre_name[0];
+        books = body.books[0];
     }
 
-    // error if need update values not provided
-    if (!genre_id || !genre_name) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
+    // if request specifies books...
+    if (books) {
+        // remove existing books/author relationships
+        await bookDao.removeBookGenreRelationshipsByGenreId(genre_id);
+
+        // create new book-author relationships
+        await createGenreBooks(req, res);
     }
 
-    // make sure id provided matches an existing record
-    let result = await genreDao.getGenreById(genre_id);
-    if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
-        return;
-    }
+    try {
+        // update genre
+        result = await genreDao.updateGenre(genre_name, genre_id);
 
-    // update the record
-    genreDao.updateGenre(genre_name, genre_id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Update Failed!');
-        }
-        // update successful 
-        else {
-            res.status(204);
-            res.send('Update Successful!');
-        }
-    });
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
+
+/* 
+This method creates new book/author relationships to populate a books authors list
+*/
+async function createGenreBooks(req, res) {
+    let bookList = req.body.books;
+    let bookArray = [];
+
+    console.log("books: " + req.body.books[0].bookId);
+    console.log("books var: " + bookList[0].bookId);
+
+    console.log("size: " + bookList.length);
+
+    // for each book in genre, create relationship
+    for (let x = 0; x < bookList.length; x++) {
+        console.log("book in loop: " + bookList[x].bookId);
+        console.log("genre_id: " + req.body.genre_id);
+        bookArray = [req.body.genre_id, bookList[x].bookId];
+        console.log("array: " + bookArray);
+
+        bookDao.addBookGenreRelationship(bookArray, function (err, result) {
+            if (err) {
+                res.status(400);
+            } else {
+                res.status(201);
+            }
+        });
+    }
+};
 
 /* 
 This method updates genre information
 */
-exports.createGenre = (function (req, res) {
+exports.createGenre = (async function (req, res) {
     let body; // payload of post request
     let genre_name; // new genre name
+    let books; // books written by author
 
     // prepare payload in json format
     if (req.is('application/json') == 'application/json') {
         body = req.body;
         genre_name = body.genre_name;
+        books = body.books;
     }
     // prepare payload in xml format
     else if (req.is('application/xml') == 'application/xml') {
         body = req.body.root;
         genre_name = body.genre_name[0];
+        books = body.books[0];
     }
 
-    // error if need update values not provided
-    if (!genre_name) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // create the record
+        const dbObj = await genreDao.createGenre(genre_name);
+        req.body.genre_id = dbObj.insertId;
 
-    // create the record
-    genreDao.createGenre(genre_name, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Create Failed!');
+        // if request specifies books...
+        if (books) {
+            // create new book-author relationships
+            await createGenreBooks(req, res);
         }
-        // create successful 
-        else {
-            res.status(201);
-            res.send('Create Successful!');
-        }
-    });
+
+        res.querySuccess = true;
+        res.queryResults = dbObj;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -814,24 +802,19 @@ exports.deleteGenre = (async function (req, res) {
     // make sure id provided matches an existing record
     let result = await genreDao.getGenreById(req.params.id);
     if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
+        res.querySuccess = false;
         return;
     }
 
-    // delete the record
-    genreDao.deleteGenre(req.params.id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        // delete successful
-        else {
-            res.status(204);
-            res.send('Delete Successful!');
-        }
-    });
+    try {
+        // delete the record
+        result = await genreDao.deleteGenre(req.params.id);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 

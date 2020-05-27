@@ -14,32 +14,48 @@ exports.getAllAuthors = function () {
 /* 
 This query returns an author by id
 */
-exports.getAuthorById = function (id) {
+exports.getAuthorById = async function (id) {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_author WHERE authorId=?', [id], function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });;
+    db.query('SELECT * FROM library.tbl_author WHERE authorId=?', [id],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
 };
 
 /* 
 This query updates author information
 */
-exports.updateAuthor = function (authorName, authorId, cb) {
+exports.updateAuthor = async function (authorName, authorId) {
   return new Promise(function (resolve, reject) {
-    db.query('UPDATE library.tbl_author SET authorName=? WHERE authorId=?', [authorName, authorId], function (err, result) {
-      cb(err, result);
-    });
+    db.query('UPDATE library.tbl_author SET authorName=? WHERE authorId=?', [authorName, authorId],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
   });
 };
 
 /* 
 This query creates a new author
 */
-exports.createAuthor = function (authorName, cb) {
+exports.createAuthor = async function (authorName) {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], function (err, result) {
-      cb(err, result);
+    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
     });
   });
 };
@@ -47,13 +63,17 @@ exports.createAuthor = function (authorName, cb) {
 /* 
 This query deletes a specified author by id
 */
-exports.deleteAuthor = function (authorId, cb) {
+exports.deleteAuthor = async function (authorId) {
   return new Promise(function (resolve, reject) {
     db.query('DELETE FROM tbl_author ' +
       'WHERE authorId=?',
       [authorId],
       (err, result) => {
-        cb(err, result);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
       });
   });
 };
