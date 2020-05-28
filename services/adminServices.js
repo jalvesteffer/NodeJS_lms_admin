@@ -430,74 +430,37 @@ exports.deleteBook = (async function (req, res) {
 /* 
 This method returns the list of all publishers
 */
-exports.getAllPublishers = (function (req, res) {
-    publisherDao.getAllPublishers()
-        // query success, process results
-        .then(function (result) {
-            // send results as json
-            if (req.accepts('json') || req.accepts('text/html')) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
-                res.send(result);
-            }
-            // send results as xml if requested
-            else if (req.accepts('application/xml')) {
-                res.setHeader('Content-Type', 'text/xml');
-                var builder = new xml2js.Builder();
-                var xml = builder.buildObject(result);
-                res.status(200);
-                res.send(xml);
-            }
-            // content negotiation failure
-            else {
-                res.send(406);
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAllPublishers query failed');
-            res.send(400);
-        });
+exports.getAllPublishers = (async function (req, res) {
+    try {
+        // get all publishers
+        result = await publisherDao.getAllPublishers();
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
 This method returns a publisher by id
 */
-exports.getPublisherById = (function (req, res) {
-    publisherDao.getPublisherById(req.params.id)
-        // query success, process results
-        .then(function (result) {
-            // if result is empty, publisher by id not found
-            if (result.length == 0) {
-                res.status(404);
-                res.send("No matching publisher found");
-            } else {
-                // send results as json
-                if (req.accepts('json') || req.accepts('text/html')) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.status(200);
-                    res.send(result);
-                }
-                // send results as xml if requested
-                else if (req.accepts('application/xml')) {
-                    let body = result[0];
-                    res.setHeader('Content-Type', 'text/xml');
-                    var builder = new xml2js.Builder();
-                    var xml = builder.buildObject(body);
-                    res.status(200);
-                    res.send(xml);
-                }
-                // content negotiation failure
-                else {
-                    res.send(406);
-                }
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getPublisherById query failed');
-            res.send(400);
-        });
+exports.getPublisherById = (async function (req, res) {
+    try {
+        // get all authors
+        result = await publisherDao.getPublisherById(req.params.id);
+
+        // if result is empty, author by id not found
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -527,40 +490,21 @@ exports.updatePublisher = (async function (req, res) {
         publisherPhone = body.publisherphone[0];
     }
 
-    // error if need update values not provided
-    if (!publisherId || !publisherName || !publisherAddress || !publisherPhone) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // update genre
+        result = await publisherDao.updatePublisher(publisherName, publisherAddress, publisherPhone, publisherId);
 
-    // make sure id provided matches an existing record
-    let result = await publisherDao.getPublisherById(publisherId);
-    if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
-        return;
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
     }
-
-    // update the record
-    publisherDao.updatePublisher(publisherName, publisherAddress, publisherPhone, publisherId, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Update Failed!');
-        }
-        // update successful 
-        else {
-            res.status(204);
-            res.send('Update Successful!');
-        }
-    });
 });
 
 /* 
 This method creates a new publisher
 */
-exports.createPublisher = (function (req, res) {
+exports.createPublisher = (async function (req, res) {
     let body; // payload of post request
     let publisherName; // new publisher name
     let publisherAddress; // new publisher address
@@ -581,26 +525,15 @@ exports.createPublisher = (function (req, res) {
         publisherPhone = body.publisherphone[0];
     }
 
-    // error if need update values not provided
-    if (!publisherName || !publisherAddress || !publisherPhone) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // create the record
+        const dbObj = await publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone);
 
-    // create the record
-    publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Create Failed!');
-        }
-        // create successful 
-        else {
-            res.status(201);
-            res.send('Create Successful!');
-        }
-    });
+        res.querySuccess = true;
+        res.queryResults = dbObj;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -611,24 +544,19 @@ exports.deletePublisher = (async function (req, res) {
     // make sure id provided matches an existing record
     let result = await publisherDao.getPublisherById(req.params.id);
     if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
+        res.querySuccess = false;
         return;
     }
 
-    // delete the record
-    publisherDao.deletePublisher(req.params.id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        // delete successful
-        else {
-            res.status(204);
-            res.send('Delete Successful!');
-        }
-    });
+    try {
+        // delete the record
+        result = await publisherDao.deletePublisher(req.params.id);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
@@ -987,7 +915,7 @@ exports.createBorrower = (function (req, res) {
         // create successful 
         else {
             res.status(201);
-            res.send('Create Successful!');
+            res.send();
         }
     });
 });
@@ -1023,74 +951,38 @@ exports.deleteBorrower = (async function (req, res) {
 /* 
 This method returns the list of all library branches
 */
-exports.getBranches = (function (req, res) {
-    branchDao.getAllBranches()
-        // query success, process results
-        .then(function (result) {
-            if (req.accepts('json') || req.accepts('text/html')) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
-                res.send(result);
-            }
-            // send results as xml if requested
-            else if (req.accepts('application/xml')) {
-                res.setHeader('Content-Type', 'text/xml');
-                var builder = new xml2js.Builder();
-                var xml = builder.buildObject(result);
-                res.status(200);
-                res.send(xml);
-            }
-            // content negotiation failure
-            else {
-                res.send(406);
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAllBranches query failed');
-            res.send(400);
-        });
+exports.getBranches = (async function (req, res) {
+    try {
+        // get all publishers
+        result = await branchDao.getAllBranches();
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 });
 
 /* 
 This method returns a branch by id
 */
-exports.getBranchById = (function (req, res) {
-    branchDao.getBranchById(req.params.id)
-        // query success, process results
-        .then(function (result) {
-            // if result is empty, branch by id not found
-            if (result.length == 0) {
-                res.status(404);
-                res.send("No matching author found");
-            } else {
-                // send results as json
-                if (req.accepts('json') || req.accepts('text/html')) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.status(200);
-                    res.send(result);
-                }
-                // send results as xml if requested
-                else if (req.accepts('application/xml')) {
-                    let body = result[0];
-                    res.setHeader('Content-Type', 'text/xml');
-                    var builder = new xml2js.Builder();
-                    var xml = builder.buildObject(body);
-                    res.status(200);
-                    res.send(xml);
-                }
-                // content negotiation failure
-                else {
-                    res.send(406);
-                }
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getBranchById query failed');
-            res.send(400);
-        });
-});
+exports.getBranchById = async (req, res) => {
+    try {
+        // get all authors
+        result = await branchDao.getBranchById(req.params.id);
+
+        // if result is empty, author by id not found
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method updates branch information
@@ -1116,40 +1008,21 @@ exports.updateBranch = (async function (req, res) {
         branchAddress = body.branchaddress[0];
     }
 
-    // error if need update values not provided
-    if (!branchId || !branchName || !branchAddress) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // update branch
+        result = await branchDao.updateBranch(branchName, branchAddress, branchId);
 
-    // make sure id provided matches an existing record
-    let result = await branchDao.getBranchById(branchId);
-    if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
-        return;
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
     }
-
-    // update the record
-    branchDao.updateBranch(branchName, branchAddress, branchId, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Update Failed!');
-        }
-        // update successful 
-        else {
-            res.status(204);
-            res.send('Update Successful!');
-        }
-    });
 });
 
 /* 
 This method creates a new branch
 */
-exports.createBranch = (function (req, res) {
+exports.createBranch = async (req, res) => {
     let body; // payload of post request 
     let branchName; // new branch name
     let branchAddress; // new branch address
@@ -1167,55 +1040,39 @@ exports.createBranch = (function (req, res) {
         branchAddress = body.branchaddress[0];
     }
 
-    // error if need update values not provided
-    if (!branchName || !branchAddress) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // create the record
+        const dbObj = await branchDao.createBranch(branchName, branchAddress);
 
-    // create the record
-    branchDao.createBranch(branchName, branchAddress, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Create Failed!');
-        }
-        // create successful 
-        else {
-            res.status(201);
-            res.send('Create Successful!');
-        }
-    });
-});
+        res.querySuccess = true;
+        res.queryResults = dbObj;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method deletes a specified branch by id
 */
-exports.deleteBranch = (async function (req, res) {
+exports.deleteBranch = async (req, res) => {
 
     // make sure id provided matches an existing record
     let result = await branchDao.getBranchById(req.params.id);
     if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
+        res.querySuccess = false;
         return;
     }
 
-    // delete the record
-    branchDao.deleteBranch(req.params.id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        // delete successful
-        else {
-            res.status(204);
-            res.send('Delete Successful!');
-        }
-    });
-});
+    try {
+        // delete the record
+        result = await branchDao.deleteBranch(req.params.id);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 //
 // extends book loan due date by 7 days

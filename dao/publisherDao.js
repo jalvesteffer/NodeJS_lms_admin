@@ -25,37 +25,41 @@ exports.getPublisherById = function (id) {
 /* 
 This query updates publisher information
 */
-exports.updatePublisher = function (publisherName, publisherAddress, publisherPhone, publisherId, cb) {
+exports.updatePublisher = async function (publisherName, publisherAddress, publisherPhone, publisherId) {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_publisher ' +
       'SET publisherName=?, publisherAddress=?, publisherPhone=? ' +
       'WHERE publisherId=?', [publisherName, publisherAddress, publisherPhone, publisherId],
-      function (err, result) {
-        cb(err, result);
-      });
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      }
+    );
   });
 };
 
 /* 
 This query creates a new publisher
 */
-exports.createPublisher = function (publisherName, publisherAddress, publisherPhone, cb) {
+exports.createPublisher = async function (publisherName, publisherAddress, publisherPhone) {
   return new Promise(function (resolve, reject) {
     db.query('INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) ' +
       'VALUES (?, ?, ?)', [publisherName, publisherAddress, publisherPhone],
-      function (err, result) {
-        cb(err, result);
-      });
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      }
+    );
   });
 };
 
 /* 
 This query deletes a specified publisher by id
 */
-exports.deletePublisher = function (id, cb) {
+exports.deletePublisher = async function (id) {
   return new Promise(function (resolve, reject) {
-    db.query('DELETE FROM tbl_publisher WHERE PublisherId=?', [id], function (err, result) {
-      cb(err, result);
-    });
+    db.query('DELETE FROM tbl_publisher WHERE PublisherId=?', [id],
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      }
+    );
   });
 };
