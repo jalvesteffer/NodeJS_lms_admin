@@ -3,7 +3,7 @@ var db = require('../db');
 /* 
 This query returns the list of all publishers
 */
-exports.getAllPublishers = function () {
+exports.getAllPublishers = async () => {
   return new Promise(function (resolve, reject) {
     db.query('SELECT * FROM library.tbl_publisher', function (err, result) {
       return err ? reject(err) : resolve(result);

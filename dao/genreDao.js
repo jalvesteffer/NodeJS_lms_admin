@@ -3,7 +3,7 @@ var db = require('../db');
 /* 
 This query returns the list of all genres
 */
-exports.getAllGenres = function () {
+exports.getAllGenres = async () => {
   return new Promise(function (resolve, reject) {
     db.query('SELECT * FROM library.tbl_genre', function (err, result) {
       return err ? reject(err) : resolve(result);

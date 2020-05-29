@@ -174,11 +174,166 @@ routes.delete('/lms/admin/authors/:id', async (req, res) => {
 });
 
 // Books
-routes.get('/lms/admin/books', adminService.getAllBooks);
-routes.get('/lms/admin/books/:id', adminService.getBookById);
-routes.put('/lms/admin/books', adminService.updateBook);
-routes.post('/lms/admin/books', adminService.createBook);
-routes.delete('/lms/admin/books/:id', adminService.deleteBook);
+routes.get('/lms/admin/books', async (req, res) => {
+    // call service to get all
+    await adminService.getAllBooks(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.get('/lms/admin/books/:id', async (req, res) => {
+    // call service to get book by id
+    await adminService.getBookById(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(404);
+    }
+});
+
+routes.put('/lms/admin/books', async (req, res) => {
+
+    // error if need update values not provided
+    if (!req.body.bookId || !req.body.title) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // call service to update
+    await adminService.updateBook(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.post('/lms/admin/books', async (req, res) => {
+
+    // error if need create values not provided
+    if (!req.body.title) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // call service to create
+    await adminService.createBook(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201);
+            res.send();
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(201);
+            res.send();
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.delete('/lms/admin/books/:id', async (req, res) => {
+    // call service to delete
+    await adminService.deleteBook(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(404);
+    }
+});
 
 // Publishers
 routes.get('/lms/admin/publishers', async (req, res) => {
