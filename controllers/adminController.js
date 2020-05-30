@@ -986,6 +986,63 @@ routes.delete('/lms/admin/branches/:id', async (req, res) => {
 });
 
 // Book Loans
-routes.put('/lms/admin/loans', adminService.extendLoan);
+routes.get('/lms/admin/loans', async (req, res) => {
+    // call service to get all overdue book loans
+    await adminService.getOverdueBookLoans(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+// Book Loans
+routes.put('/lms/admin/loans', async (req, res) => {
+    // call service to delete
+    await adminService.extendLoan(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(404);
+    }
+});
 
 module.exports = routes;

@@ -1011,45 +1011,63 @@ exports.deleteBranch = async (req, res) => {
     }
 };
 
+/* 
+This method returns the list of all library branches
+*/
+exports.getOverdueBookLoans = async (req, res) => {
+    let loan = null; // current loan in for loop
+
+    // holds query results for diffent entity types
+    let bookResult = null;
+    let branchResult = null;
+    let borrowerResult = null;
+
+    try {
+        // get all overdue book loans
+        let result = await bookLoansDao.getOverdueBookLoans();
+
+        // for each loan, get other info
+        for (loan of result) {
+            bookResult = await bookDao.getBookById(loan.bookId);
+            if (bookResult && bookResult.length > 0) {
+                loan.book = bookResult;
+            }
+            branchResult = await branchDao.getBranchById(loan.branchId);
+            if (branchResult && branchResult.length > 0) {
+                loan.branch = branchResult;
+            }
+            borrowerResult = await borrowerDao.getBorrowerById(loan.cardNo);
+            if (borrowerResult && borrowerResult.length > 0) {
+                loan.borrower = borrowerResult;
+            }
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
 //
 // extends book loan due date by 7 days
 //
-exports.extendLoan = async function extendLoan(req, res) {
+exports.extendLoan = async (req, res) => {
 
-    // make sure all key loan details provided to identify book loan to extend
-    if (req.body.bookId && req.body.branchId && req.body.cardNo && req.body.dateOut) {
+    try {
         // look for matching book loan to extend
-        await bookLoansDao.findBookLoansById(req.body)
-            .then(function (result) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
+        let result = await bookLoansDao.findBookLoansById(req.body.loanId);
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
 
-                // get loan due date
-                let dateTime = new Date(result[0].dueDate.toISOString());
+        // call query to extend overdue book loan by 7 days
+        await bookLoansDao.extendOverdueBookLoan(req.body.loanId);
 
-                // add 7 days to loan due date
-                dateTime.setDate(dateTime.getDate() + parseInt(7));
-                req.body.dueDate = dateTime.toISOString().slice(0, 10);
-
-                // save new due date for loan
-                bookLoansDao.saveBookLoansById(req.body)
-                    .then(function (result) {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.status(200);
-                    })
-                    .catch(function (err) {
-                        res.status(400);
-                    });
-
-                res.send(result);
-            })
-            .catch(function (err) {
-                console.log("Error processing request");
-                res.status(400);
-            });
-
-    } else {
-        console.log("Insufficient loan details provided.  Could not process request.");
-        res.status(400);
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
     }
 };
