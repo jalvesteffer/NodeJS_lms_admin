@@ -662,11 +662,166 @@ routes.delete('/lms/admin/genres/:id', async (req, res) => {
 });
 
 // Borrowers
-routes.get('/lms/admin/borrowers', adminService.getBorrowers);
-routes.get('/lms/admin/borrowers/:id', adminService.getBorrowerById);
-routes.put('/lms/admin/borrowers', adminService.updateBorrower);
-routes.post('/lms/admin/borrowers', adminService.createBorrower);
-routes.delete('/lms/admin/borrowers/:id', adminService.deleteBorrower);
+routes.get('/lms/admin/borrowers', async (req, res) => {
+    // call service to get all
+    await adminService.getBorrowers(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.get('/lms/admin/borrowers/:id', async (req, res) => {
+    // call service to get borrower by id
+    await adminService.getBorrowerById(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(404);
+    }
+});
+
+routes.put('/lms/admin/borrowers', async (req, res) => {
+
+    // error if need update values not provided
+    if (!req.body.cardNo || !req.body.name) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // call service to update
+    await adminService.updateBorrower(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.post('/lms/admin/borrowers', async (req, res) => {
+
+    // error if need create values not provided
+    if (!req.body.name) {
+        res.status(400);
+        res.send('Request does not provide all neccessary information');
+        return;
+    }
+
+    // call service to create
+    await adminService.createBorrower(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201);
+            res.send();
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(201);
+            res.send();
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.delete('/lms/admin/borrowers/:id', async (req, res) => {
+    // call service to delete
+    await adminService.deleteBorrower(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(404);
+    }
+});
 
 // Library Branches
 routes.get('/lms/admin/branches', async (req, res) => {

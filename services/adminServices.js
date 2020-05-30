@@ -26,7 +26,6 @@ exports.getAllAuthors = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-
 });
 
 /* 
@@ -755,80 +754,43 @@ exports.deleteGenre = (async function (req, res) {
 /* 
 This method returns the list of all borrowers
 */
-exports.getBorrowers = (function (req, res) {
-    borrowerDao.getAllBorrowers()
-        // query success, process results
-        .then(function (result) {
-            // send results as json
-            if (req.accepts('json') || req.accepts('text/html')) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200);
-                res.send(result);
-            }
-            // send results as xml if requested
-            else if (req.accepts('application/xml')) {
-                res.setHeader('Content-Type', 'text/xml');
-                var builder = new xml2js.Builder();
-                var xml = builder.buildObject(result);
-                res.status(200);
-                res.send(xml);
-            }
-            // content negotiation failure
-            else {
-                res.send(406);
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getAllBorrowers query failed');
-            res.send(400);
-        });
-});
+exports.getBorrowers = async (req, res) => {
+    try {
+        // get all authors
+        result = await borrowerDao.getAllBorrowers();
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method returns a borrower by id
 */
-exports.getBorrowerById = (function (req, res) {
-    borrowerDao.getBorrowerById(req.params.id)
-        // query success, process results
-        .then(function (result) {
-            // if result is empty, borrower by id not found
-            if (result.length == 0) {
-                res.status(404);
-                res.send("No matching author found");
-            } else {
-                // send results as json
-                if (req.accepts('json') || req.accepts('text/html')) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.status(200);
-                    res.send(result);
-                }
-                // send results as xml if requested
-                else if (req.accepts('application/xml')) {
-                    let body = result[0];
-                    res.setHeader('Content-Type', 'text/xml');
-                    var builder = new xml2js.Builder();
-                    var xml = builder.buildObject(body);
-                    res.status(200);
-                    res.send(xml);
-                }
-                // content negotiation failure
-                else {
-                    res.send(406);
-                }
-            }
-        })
-        // query failure
-        .catch(function (err) {
-            console.log('getBorrowerById query failed');
-            res.send(400);
-        });
-});
+exports.getBorrowerById = async (req, res) => {
+    try {
+        // get all borrowers
+        result = await borrowerDao.getBorrowerById(req.params.id);
+
+        // if result is empty, borrower by id not found
+        if (result.length == 0) {
+            res.querySuccess = false;
+            return;
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method updates borrower information
 */
-exports.updateBorrower = (async function (req, res) {
+exports.updateBorrower = async (req, res) => {
     let body; // payload of put request
     let name; // id of borrower to update
     let address; // new address
@@ -852,40 +814,21 @@ exports.updateBorrower = (async function (req, res) {
         cardNo = body.cardno[0];
     }
 
-    // error if need update values not provided
-    if (!name || !address || !phone || !cardNo) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // update the record
+        result = await borrowerDao.updateBorrower(name, address, phone, cardNo);
 
-    // make sure id provided matches an existing record
-    let result = await borrowerDao.getBorrowerById(cardNo);
-    if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
-        return;
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
     }
-
-    // update the record
-    borrowerDao.updateBorrower(name, address, phone, cardNo, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Update Failed!');
-        }
-        // update successful 
-        else {
-            res.status(204);
-            res.send('Update Successful!');
-        }
-    });
-});
+};
 
 /* 
 This method creates a new borrower
 */
-exports.createBorrower = (function (req, res) {
+exports.createBorrower = async (req, res) => {
     let body; // payload of post request
     let name; // new borrower name
     let address; // new address
@@ -906,54 +849,41 @@ exports.createBorrower = (function (req, res) {
         phone = body.phone[0];
     }
 
-    // error if need update values not provided
-    if (!name || !address || !phone) {
-        res.status(400);
-        res.send('Request does not provide all neccessary information');
-        return;
-    }
+    try {
+        // update the record
+        const dbObj = await borrowerDao.createBorrower(name, address, phone);
+        req.body.cardNo = dbObj.insertId;
 
-    // create the record
-    borrowerDao.createBorrower(name, address, phone, function (err, result) {
-        if (err) {
-            res.status(400);
-            res.send('Create Failed!');
-        }
-        // create successful 
-        else {
-            res.status(201);
-            res.send();
-        }
-    });
-});
+        res.querySuccess = true;
+        res.queryResults = dbObj;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method deletes a specified borrower by id
 */
-exports.deleteBorrower = (async function (req, res) {
+exports.deleteBorrower = async (req, res) => {
 
     // make sure id provided matches an existing record
     let result = await borrowerDao.getBorrowerById(req.params.id);
+
     if (result.length == 0) {
-        res.status(404);
-        res.send('ID provided does not match any existing records');
+        res.querySuccess = false;
         return;
     }
 
-    // delete the record
-    borrowerDao.deleteBorrower(req.params.id, function (err, result) {
-        // error with query
-        if (err) {
-            res.status(400);
-            res.send('Delete Failed!');
-        }
-        // delete successful
-        else {
-            res.status(204);
-            res.send('Delete Successful!');
-        }
-    });
-});
+    try {
+        // delete the record
+        result = await borrowerDao.deleteBorrower(req.params.id);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
 
 /* 
 This method returns the list of all library branches

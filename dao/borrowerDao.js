@@ -3,35 +3,37 @@ var db = require('../db');
 /* 
 This query returns the list of all borrowers
 */
-exports.getAllBorrowers = function () {
+exports.getAllBorrowers = async () => {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_borrower', function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });;
+    db.query('SELECT * FROM library.tbl_borrower',
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      });
+  });
 };
 
 /* 
 This query returns a borrower by id
 */
-exports.getBorrowerById = function (cardNo) {
+exports.getBorrowerById = async (cardNo) => {
   return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_borrower WHERE cardNo=?', [cardNo], function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });;
+    db.query('SELECT * FROM library.tbl_borrower WHERE cardNo=?', [cardNo],
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      });
+  });
 };
 
 /* 
 This query updates borrower information
 */
-exports.updateBorrower = function (name, address, phone, cardNo, cb) {
+exports.updateBorrower = async (name, address, phone, cardNo) => {
   return new Promise(function (resolve, reject) {
     db.query('UPDATE tbl_borrower ' +
       'SET name=?, address=?, phone=? ' +
       'WHERE cardNo=?', [name, address, phone, cardNo],
-      function (err, result) {
-        cb(err, result);
+      (err, result) => {
+        err ? reject(err) : resolve(result);
       });
   });
 };
@@ -39,21 +41,23 @@ exports.updateBorrower = function (name, address, phone, cardNo, cb) {
 /* 
 This query creates a new borrower
 */
-exports.createBorrower = function (name, address, phone, cb) {
+exports.createBorrower = async (name, address, phone) => {
   return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [name, address, phone], function (err, result) {
-      cb(err, result);
-    });
+    db.query('INSERT INTO tbl_borrower (name, address, phone) VALUES (?, ?, ?)', [name, address, phone],
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      });
   });
 };
 
 /* 
 This query deletes a specified borrower by id
 */
-exports.deleteBorrower = function (cardNo, cb) {
+exports.deleteBorrower = async (cardNo) => {
   return new Promise(function (resolve, reject) {
-    db.query('DELETE FROM tbl_borrower WHERE cardNo=?', [cardNo], function (err, result) {
-      cb(err, result);
-    });
+    db.query('DELETE FROM tbl_borrower WHERE cardNo=?', [cardNo],
+      (err, result) => {
+        err ? reject(err) : resolve(result);
+      });
   });
 };
