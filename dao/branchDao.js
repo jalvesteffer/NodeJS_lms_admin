@@ -1,26 +1,24 @@
-var db = require('../db');
+var db = require('../db').getDb();
 
 /* 
 This query returns the list of all library branches
 */
 exports.getAllBranches = async () => {
-  return new Promise(function (resolve, reject) {
-    db.query('select * from library.tbl_library_branch', function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });
+  let branches = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_library_branch');
+  return branches;
 };
 
 /* 
 This query returns a branch by id
 */
 exports.getBranchById = async (id) => {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_library_branch WHERE branchId=?', [id],
-      (err, result) => {
-        return err ? reject(err) : resolve(result);
-      });
-  });
+  let branch = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_library_branch ' +
+    'WHERE branchId=?', [id]);
+  return branch;
 };
 
 /* 

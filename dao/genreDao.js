@@ -1,27 +1,24 @@
-var db = require('../db');
+var db = require('../db').getDb();
 
 /* 
 This query returns the list of all genres
 */
 exports.getAllGenres = async () => {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_genre', function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });;
+  let genres = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_genre');
+  return genres;
 };
 
 /* 
 This query returns a genre by id
 */
-exports.getGenreById = async function (genre_id) {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_genre WHERE genre_id=?', [genre_id],
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      }
-    );
-  });
+exports.getGenreById = async (genre_id) => {
+  let genre = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_genre ' +
+    'WHERE genre_id=?', [genre_id]);
+  return genre;
 };
 
 /* 

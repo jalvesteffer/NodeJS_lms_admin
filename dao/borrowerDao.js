@@ -1,27 +1,24 @@
-var db = require('../db');
+var db = require('../db').getDb();
 
 /* 
 This query returns the list of all borrowers
 */
 exports.getAllBorrowers = async () => {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_borrower',
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      });
-  });
+  let borrowers = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_borrower');
+  return borrowers;
 };
 
 /* 
 This query returns a borrower by id
 */
 exports.getBorrowerById = async (cardNo) => {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_borrower WHERE cardNo=?', [cardNo],
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      });
-  });
+  let borrower = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_borrower ' +
+    'WHERE cardNo=?', [cardNo]);
+  return borrower;
 };
 
 /* 

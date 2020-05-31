@@ -5,33 +5,34 @@ let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
 let bookLoansDao = require('../dao/bookLoansDao');
+const db = require("../db").getDb();
 
 /* 
 This method returns the list of all authors
 */
-exports.getAllAuthors = (async function (req, res) {
+exports.getAllAuthors = async (req, res) => {
     try {
         // get all authors
         result = await authorDao.getAllAuthors();
 
         // for each author, get the books the author wrote
-        for (author of result) {
-            booksResult = await bookDao.getBooksByAuthorId(author.authorId);
-            if (booksResult && booksResult.length > 0) {
-                author.books = booksResult;
-            }
-        }
+        /*         for (author of result) {
+                    booksResult = await bookDao.getBooksByAuthorId(author.authorId);
+                    if (booksResult && booksResult.length > 0) {
+                        author.books = booksResult;
+                    }
+                } */
         res.querySuccess = true;
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method returns an author by id
 */
-exports.getAuthorById = (async function (req, res) {
+exports.getAuthorById = async (req, res) => {
     try {
         // get all authors
         result = await authorDao.getAuthorById(req.params.id);
@@ -43,17 +44,17 @@ exports.getAuthorById = (async function (req, res) {
         }
 
         // for author, get the books the author wrote
-        booksResult = await bookDao.getBooksByAuthorId(req.params.id);
-        if (booksResult && booksResult.length > 0) {
-            result[0].books = booksResult;
-        }
+        /*         booksResult = await bookDao.getBooksByAuthorId(req.params.id);
+                if (booksResult && booksResult.length > 0) {
+                    result[0].books = booksResult;
+                } */
 
         res.querySuccess = true;
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method updates author information
@@ -79,16 +80,18 @@ exports.updateAuthor = (async function (req, res) {
         books = body.books[0];
     }
 
-    // if request specifies books...
-    if (books) {
-        // remove existing books/author relationships
-        await bookDao.removeBookAuthorRelationshipsByAuthorId(authorId);
-
-        // create new book-author relationships
-        await createAuthorBooks(req, res);
-    }
-
     try {
+
+
+        // if request specifies books...
+        if (books) {
+            // remove existing books/author relationships
+            await bookDao.removeBookAuthorRelationshipsByAuthorId(authorId);
+
+            // create new book-author relationships
+            await createAuthorBooks(req, res);
+        }
+
         // update the record
         result = await authorDao.updateAuthor(authorName, authorId);
 
@@ -205,20 +208,20 @@ exports.getAllBooks = async (req, res) => {
         result = await bookDao.getAllBooks();
 
         // for each book, get other info
-        for (book of result) {
-            publisherResult = await bookDao.getPublisherByBookId(book.bookId);
-            if (publisherResult && publisherResult.length > 0) {
-                book.publisher = publisherResult;
-            }
-            authorsResult = await bookDao.getAuthorsByBookId(book.bookId);
-            if (authorsResult && authorsResult.length > 0) {
-                book.authors = authorsResult;
-            }
-            genresResult = await bookDao.getGenresByBookId(book.bookId);
-            if (genresResult && genresResult.length > 0) {
-                book.genres = genresResult;
-            }
-        }
+        /*         for (book of result) {
+                    publisherResult = await bookDao.getPublisherByBookId(book.bookId);
+                    if (publisherResult && publisherResult.length > 0) {
+                        book.publisher = publisherResult;
+                    }
+                    authorsResult = await bookDao.getAuthorsByBookId(book.bookId);
+                    if (authorsResult && authorsResult.length > 0) {
+                        book.authors = authorsResult;
+                    }
+                    genresResult = await bookDao.getGenresByBookId(book.bookId);
+                    if (genresResult && genresResult.length > 0) {
+                        book.genres = genresResult;
+                    }
+                } */
         res.querySuccess = true;
         res.queryResults = result;
     } catch (err) {
@@ -241,18 +244,18 @@ exports.getBookById = async (req, res) => {
         }
 
         // for book, get other info
-        publisherResult = await bookDao.getPublisherByBookId(req.params.id);
-        if (publisherResult && publisherResult.length > 0) {
-            result[0].publisher = publisherResult;
-        }
-        authorsResult = await bookDao.getAuthorsByBookId(req.params.id);
-        if (authorsResult && authorsResult.length > 0) {
-            result[0].authors = authorsResult;
-        }
-        genresResult = await bookDao.getGenresByBookId(req.params.id);
-        if (genresResult && genresResult.length > 0) {
-            result[0].genres = genresResult;
-        }
+        /*         publisherResult = await bookDao.getPublisherByBookId(req.params.id);
+                if (publisherResult && publisherResult.length > 0) {
+                    result[0].publisher = publisherResult;
+                }
+                authorsResult = await bookDao.getAuthorsByBookId(req.params.id);
+                if (authorsResult && authorsResult.length > 0) {
+                    result[0].authors = authorsResult;
+                }
+                genresResult = await bookDao.getGenresByBookId(req.params.id);
+                if (genresResult && genresResult.length > 0) {
+                    result[0].genres = genresResult;
+                } */
 
         res.querySuccess = true;
         res.queryResults = result;
@@ -1027,20 +1030,20 @@ exports.getOverdueBookLoans = async (req, res) => {
         let result = await bookLoansDao.getOverdueBookLoans();
 
         // for each loan, get other info
-        for (loan of result) {
-            bookResult = await bookDao.getBookById(loan.bookId);
-            if (bookResult && bookResult.length > 0) {
-                loan.book = bookResult;
-            }
-            branchResult = await branchDao.getBranchById(loan.branchId);
-            if (branchResult && branchResult.length > 0) {
-                loan.branch = branchResult;
-            }
-            borrowerResult = await borrowerDao.getBorrowerById(loan.cardNo);
-            if (borrowerResult && borrowerResult.length > 0) {
-                loan.borrower = borrowerResult;
-            }
-        }
+        /*         for (loan of result) {
+                    bookResult = await bookDao.getBookById(loan.bookId);
+                    if (bookResult && bookResult.length > 0) {
+                        loan.book = bookResult;
+                    }
+                    branchResult = await branchDao.getBranchById(loan.branchId);
+                    if (branchResult && branchResult.length > 0) {
+                        loan.branch = branchResult;
+                    }
+                    borrowerResult = await borrowerDao.getBorrowerById(loan.cardNo);
+                    if (borrowerResult && borrowerResult.length > 0) {
+                        loan.borrower = borrowerResult;
+                    }
+                } */
 
         res.querySuccess = true;
         res.queryResults = result;

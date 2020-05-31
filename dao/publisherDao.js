@@ -1,4 +1,4 @@
-var db = require('../db');
+var db = require('../db').getDb();
 
 /* 
 This query returns the list of all publishers
@@ -14,12 +14,12 @@ exports.getAllPublishers = async () => {
 /* 
 This query returns a publisher by id
 */
-exports.getPublisherById = function (id) {
-  return new Promise(function (resolve, reject) {
-    db.query('SELECT * FROM library.tbl_publisher WHERE publisherId=?', [id], function (err, result) {
-      return err ? reject(err) : resolve(result);
-    });
-  });;
+exports.getPublisherById = async (id) => {
+  let publisher = await db.query(
+    'SELECT * ' +
+    'FROM library.tbl_publisher ' +
+    'WHERE publisherId=?', [id]);
+  return publisher;
 };
 
 /* 

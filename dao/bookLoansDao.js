@@ -1,19 +1,14 @@
-var db = require('../db');
+var db = require('../db').getDb();
 
 /* 
 This query gets all books that are overdue
 */
 exports.getOverdueBookLoans = async () => {
-  return new Promise(function (resolve, reject) {
-    db.query(
-      'SELECT * ' +
-      'FROM tbl_book_Loans ' +
-      'WHERE dueDate < CURRENT_TIMESTAMP()',
-      [],
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      });
-  });
+  let loans = await db.query(
+    'SELECT * ' +
+    'FROM tbl_book_Loans ' +
+    'WHERE dueDate < CURRENT_TIMESTAMP()');
+  return loans;
 };
 
 /* 
@@ -36,12 +31,9 @@ exports.extendOverdueBookLoan = async (id) => {
 This query returns a book loan by id
 */
 exports.findBookLoansById = async (id) => {
-  return new Promise(function (resolve, reject) {
-    db.query(
-      'SELECT * FROM tbl_book_Loans WHERE loanId=?',
-      [id],
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      });
-  });
+  let loan = await db.query(
+    'SELECT * ' +
+    'FROM tbl_book_Loans ' +
+    'WHERE loanId=?', [id]);
+  return loan;
 };
