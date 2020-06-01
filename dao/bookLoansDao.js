@@ -15,16 +15,11 @@ exports.getOverdueBookLoans = async () => {
 This query extends an overdue book by 7 days
 */
 exports.extendOverdueBookLoan = async (id) => {
-  return new Promise(function (resolve, reject) {
-    db.query(
-      'UPDATE tbl_book_loans ' +
-      'SET dueDate=DATE_ADD(dueDate, INTERVAL 7 DAY) ' +
-      'WHERE loanId=?',
-      [id],
-      (err, result) => {
-        err ? reject(err) : resolve(result);
-      });
-  });
+  let retVal = await db.query(
+    'UPDATE tbl_book_loans ' +
+    'SET dueDate=DATE_ADD(dueDate, INTERVAL 7 DAY) ' +
+    'WHERE loanId=?', [id]);
+  return retVal;
 };
 
 /* 

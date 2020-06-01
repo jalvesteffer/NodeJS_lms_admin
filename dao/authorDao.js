@@ -36,50 +36,32 @@ exports.updateAuthor = async (authorName, authorId) => {
 This query creates a new author
 */
 exports.createAuthor = async (authorName) => {
-  return new Promise(function (resolve, reject) {
-    db.query('INSERT INTO tbl_author (authorName) VALUES (?)', [authorName], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
-  });
+  let retVal = await db.query(
+    'INSERT INTO tbl_author (authorName) ' +
+    'VALUES (?)', [authorName]);
+  return retVal;
 };
 
 /* 
 This query deletes a specified author by id
 */
 exports.deleteAuthor = async (authorId) => {
-  return new Promise(function (resolve, reject) {
-    db.query('DELETE FROM tbl_author ' +
-      'WHERE authorId=?',
-      [authorId],
-      (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-  });
+  let retVal = await db.query(
+    'DELETE FROM tbl_author ' +
+    'WHERE authorId=?', [authorId]);
+  return retVal;
 };
 
 /* 
 This query deletes all books by by an author's id
 */
 exports.deleteBooksByAuthorId = async (id) => {
-  return new Promise(function (resolve, reject) {
-    db.query('DELETE FROM tbl_book WHERE bookId IN ' +
-      '(SELECT bookId FROM tbl_book_authors WHERE authorId=?)',
-      [id],
-      (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      }
-    );
-  });
+  let retVal = await db.query(
+    'DELETE FROM tbl_book ' +
+    'WHERE bookId IN ' +
+
+    '(SELECT bookId ' +
+    'FROM tbl_book_authors ' +
+    'WHERE authorId=?)', [id]);
+  return retVal;
 };
