@@ -5,11 +5,12 @@ let genreDao = require('../dao/genreDao');
 let borrowerDao = require('../dao/borrowerDao');
 let branchDao = require('../dao/branchDao');
 let bookLoansDao = require('../dao/bookLoansDao');
+const db = require("../db").getDb();
 
 /* 
 This method returns the list of all authors
 */
-exports.getAllAuthors = (async function (req, res) {
+exports.getAllAuthors = async (req, res) => {
     try {
         // get all authors
         result = await authorDao.getAllAuthors();
@@ -26,12 +27,12 @@ exports.getAllAuthors = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method returns an author by id
 */
-exports.getAuthorById = (async function (req, res) {
+exports.getAuthorById = async (req, res) => {
     try {
         // get all authors
         result = await authorDao.getAuthorById(req.params.id);
@@ -53,12 +54,12 @@ exports.getAuthorById = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method updates author information
 */
-exports.updateAuthor = (async function (req, res) {
+exports.updateAuthor = async (req, res) => {
     let body; // payload of put request
     let authorId; // id of author to update
     let authorName; // new author name
@@ -79,16 +80,19 @@ exports.updateAuthor = (async function (req, res) {
         books = body.books[0];
     }
 
-    // if request specifies books...
-    if (books) {
-        // remove existing books/author relationships
-        await bookDao.removeBookAuthorRelationshipsByAuthorId(authorId);
-
-        // create new book-author relationships
-        await createAuthorBooks(req, res);
-    }
-
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
+        // if request specifies books...
+        if (books) {
+            // remove existing books/author relationships
+            await bookDao.removeBookAuthorRelationshipsByAuthorId(authorId);
+
+            // create new book-author relationships
+            await createAuthorBooks(req, res);
+        }
+
         // update the record
         result = await authorDao.updateAuthor(authorName, authorId);
 
@@ -97,7 +101,15 @@ exports.updateAuthor = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method creates new book/author relationships to populate a books authors list
@@ -112,9 +124,9 @@ async function createAuthorBooks(req, res) {
 
         bookDao.addBookAuthorRelationship(bookArray, function (err, result) {
             if (err) {
-                res.status(400);
+                res.querySuccess = false;
             } else {
-                res.status(201);
+                res.querySuccess = true;
             }
         });
     }
@@ -123,7 +135,7 @@ async function createAuthorBooks(req, res) {
 /* 
 This method creates a new author
 */
-exports.createAuthor = (async function (req, res) {
+exports.createAuthor = async (req, res) => {
     let body; // payload of post request
     let authorName; // new author name
     let books; // books written by author
@@ -142,6 +154,9 @@ exports.createAuthor = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // update the record
         const dbObj = await authorDao.createAuthor(authorName);
         req.body.authorId = dbObj.insertId;
@@ -157,7 +172,15 @@ exports.createAuthor = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method deletes a specified author by id
@@ -173,6 +196,9 @@ exports.deleteAuthor = async function deleteAuthorTransaction(req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await authorDao.deleteAuthor(req.params.id);
 
@@ -181,20 +207,15 @@ exports.deleteAuthor = async function deleteAuthorTransaction(req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-};
 
-/* 
-This method deletes all books by by an author's id
-*/
-async function deleteBooksByAuthorId(req, res) {
-    await bookDao.deleteBooksByAuthorId(req.params.id, function (err, result) {
-        if (err) {
-            res.status(400);
-        } else {
-            res.status(204);
-        }
-    });
-}
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method returns the list of all books
@@ -285,27 +306,30 @@ exports.updateBook = (async function (req, res) {
         pubId = body.pubId[0];
     }
 
-    // if request specifies authors...
-    if (body.authors) {
-
-        // remove existing books/author relationships
-        await bookDao.removeBookAuthorRelationshipsByBookId(bookId);
-
-        // create new book-author relationships
-        await createBookAuthors(req, res);
-    }
-
-    // if request specifies genres...
-    if (body.genres) {
-
-        // remove existing books/author relationships
-        await bookDao.removeBookGenreRelationshipsByBookId(bookId);
-
-        // create new book-author relationships
-        await createBookGenres(req, res);
-    }
-
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
+        // if request specifies authors...
+        if (body.authors) {
+
+            // remove existing books/author relationships
+            await bookDao.removeBookAuthorRelationshipsByBookId(bookId);
+
+            // create new book-author relationships
+            await createBookAuthors(req, res);
+        }
+
+        // if request specifies genres...
+        if (body.genres) {
+
+            // remove existing books/author relationships
+            await bookDao.removeBookGenreRelationshipsByBookId(bookId);
+
+            // create new book-author relationships
+            await createBookGenres(req, res);
+        }
+
         // update the record
         result = await bookDao.updateBook(bookId, title, pubId);
 
@@ -313,6 +337,14 @@ exports.updateBook = (async function (req, res) {
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 });
 
@@ -341,6 +373,9 @@ exports.createBook = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // create new record in book table and get its key
         let key = await bookDao.createBook(body);
         req.body.bookId = key.insertId;
@@ -362,17 +397,15 @@ exports.createBook = async (req, res) => {
     } catch (err) {
         res.querySuccess = false;
     }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
 };
-
-/* 
-This method a new record in the book table and returns its key
-*/
-async function createBookBase(req, res) {
-    let book = req.body;
-
-    const dbObj = await bookDao.createBook(book);
-    return dbObj.insertId;
-}
 
 /* 
 This method creates new book/author relationships to populate a books authors list
@@ -387,9 +420,9 @@ async function createBookAuthors(req, res) {
         bookArray = [book.bookId, book.authors[x].authorId];
         bookDao.addBookAuthorRelationship(bookArray, function (err, result) {
             if (err) {
-                res.status(400);
+                res.querySuccess = false;
             } else {
-                res.status(201);
+                res.querySuccess = true;
             }
         });
     }
@@ -406,12 +439,11 @@ async function createBookGenres(req, res) {
     // for each genre in book, create relationship
     for (x in book.genres) {
         bookArray = [book.genres[x].genre_id, book.bookId];
-        console.log("Inside createBookGenres " + bookArray);
         bookDao.addBookGenreRelationship(bookArray, function (err, result) {
             if (err) {
-                res.status(400);
+                res.querySuccess = false;
             } else {
-                res.status(201);
+                res.querySuccess = true;
             }
         });
     }
@@ -431,6 +463,9 @@ exports.deleteBook = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await bookDao.deleteBook(req.params.id);
 
@@ -439,12 +474,20 @@ exports.deleteBook = async (req, res) => {
     } catch (err) {
         res.querySuccess = false;
     }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
 };
 
 /* 
 This method returns the list of all publishers
 */
-exports.getAllPublishers = (async function (req, res) {
+exports.getAllPublishers = async (req, res) => {
     try {
         // get all publishers
         result = await publisherDao.getAllPublishers();
@@ -454,12 +497,12 @@ exports.getAllPublishers = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method returns a publisher by id
 */
-exports.getPublisherById = (async function (req, res) {
+exports.getPublisherById = async (req, res) => {
     try {
         // get all authors
         result = await publisherDao.getPublisherById(req.params.id);
@@ -475,12 +518,12 @@ exports.getPublisherById = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method updates publisher information
 */
-exports.updatePublisher = (async function (req, res) {
+exports.updatePublisher = async (req, res) => {
     let body; // payload of put request
     let publisherId; // id of publisher to update
     let publisherName; // new publisher name
@@ -505,6 +548,9 @@ exports.updatePublisher = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // update genre
         result = await publisherDao.updatePublisher(publisherName, publisherAddress, publisherPhone, publisherId);
 
@@ -513,12 +559,20 @@ exports.updatePublisher = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method creates a new publisher
 */
-exports.createPublisher = (async function (req, res) {
+exports.createPublisher = async (req, res) => {
     let body; // payload of post request
     let publisherName; // new publisher name
     let publisherAddress; // new publisher address
@@ -540,6 +594,9 @@ exports.createPublisher = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // create the record
         const dbObj = await publisherDao.createPublisher(publisherName, publisherAddress, publisherPhone);
 
@@ -548,12 +605,20 @@ exports.createPublisher = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method deletes a specified publisher by id
 */
-exports.deletePublisher = (async function (req, res) {
+exports.deletePublisher = async (req, res) => {
 
     // make sure id provided matches an existing record
     let result = await publisherDao.getPublisherById(req.params.id);
@@ -563,6 +628,9 @@ exports.deletePublisher = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await publisherDao.deletePublisher(req.params.id);
 
@@ -571,12 +639,20 @@ exports.deletePublisher = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method returns the list of all genres
 */
-exports.getAllGenres = (async function (req, res) {
+exports.getAllGenres = async (req, res) => {
 
     try {
         // get all genres
@@ -595,12 +671,12 @@ exports.getAllGenres = (async function (req, res) {
         res.querySuccess = false;
     }
 
-});
+};
 
 /* 
 This method returns a genre by id
 */
-exports.getGenreById = (async function (req, res) {
+exports.getGenreById = async (req, res) => {
     try {
         // get all authors
         result = await genreDao.getGenreById(req.params.id);
@@ -622,12 +698,12 @@ exports.getGenreById = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method updates genre information
 */
-exports.updateGenre = (async function (req, res) {
+exports.updateGenre = async (req, res) => {
     let body; // payload of put request
     let genre_id; // id of genre to update
     let genre_name; // new genre name
@@ -648,16 +724,19 @@ exports.updateGenre = (async function (req, res) {
         books = body.books[0];
     }
 
-    // if request specifies books...
-    if (books) {
-        // remove existing books/author relationships
-        await bookDao.removeBookGenreRelationshipsByGenreId(genre_id);
-
-        // create new book-author relationships
-        await createGenreBooks(req, res);
-    }
-
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
+        // if request specifies books...
+        if (books) {
+            // remove existing books/author relationships
+            await bookDao.removeBookGenreRelationshipsByGenreId(genre_id);
+
+            // create new book-author relationships
+            await createGenreBooks(req, res);
+        }
+
         // update genre
         result = await genreDao.updateGenre(genre_name, genre_id);
 
@@ -666,7 +745,15 @@ exports.updateGenre = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method creates new book/author relationships to populate a books authors list
@@ -681,9 +768,9 @@ async function createGenreBooks(req, res) {
 
         bookDao.addBookGenreRelationship(bookArray, function (err, result) {
             if (err) {
-                res.status(400);
+                res.querySuccess = false;
             } else {
-                res.status(201);
+                res.querySuccess = true;
             }
         });
     }
@@ -692,7 +779,7 @@ async function createGenreBooks(req, res) {
 /* 
 This method updates genre information
 */
-exports.createGenre = (async function (req, res) {
+exports.createGenre = async (req, res) => {
     let body; // payload of post request
     let genre_name; // new genre name
     let books; // books written by author
@@ -711,6 +798,9 @@ exports.createGenre = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // create the record
         const dbObj = await genreDao.createGenre(genre_name);
         req.body.genre_id = dbObj.insertId;
@@ -726,12 +816,20 @@ exports.createGenre = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method deletes a specified genre by id
 */
-exports.deleteGenre = (async function (req, res) {
+exports.deleteGenre = async (req, res) => {
 
     // make sure id provided matches an existing record
     let result = await genreDao.getGenreById(req.params.id);
@@ -741,6 +839,9 @@ exports.deleteGenre = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await genreDao.deleteGenre(req.params.id);
 
@@ -749,7 +850,15 @@ exports.deleteGenre = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method returns the list of all borrowers
@@ -815,6 +924,9 @@ exports.updateBorrower = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // update the record
         result = await borrowerDao.updateBorrower(name, address, phone, cardNo);
 
@@ -822,6 +934,14 @@ exports.updateBorrower = async (req, res) => {
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 };
 
@@ -850,6 +970,9 @@ exports.createBorrower = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // update the record
         const dbObj = await borrowerDao.createBorrower(name, address, phone);
         req.body.cardNo = dbObj.insertId;
@@ -858,6 +981,14 @@ exports.createBorrower = async (req, res) => {
         res.queryResults = dbObj;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 };
 
@@ -875,6 +1006,9 @@ exports.deleteBorrower = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await borrowerDao.deleteBorrower(req.params.id);
 
@@ -883,12 +1017,20 @@ exports.deleteBorrower = async (req, res) => {
     } catch (err) {
         res.querySuccess = false;
     }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
 };
 
 /* 
 This method returns the list of all library branches
 */
-exports.getBranches = (async function (req, res) {
+exports.getBranches = async (req, res) => {
     try {
         // get all publishers
         result = await branchDao.getAllBranches();
@@ -898,7 +1040,7 @@ exports.getBranches = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+};
 
 /* 
 This method returns a branch by id
@@ -924,7 +1066,7 @@ exports.getBranchById = async (req, res) => {
 /* 
 This method updates branch information
 */
-exports.updateBranch = (async function (req, res) {
+exports.updateBranch = async (req, res) => {
     let body; // payload of put request
     let branchId; // id of branch to update
     let branchName; // new branch name
@@ -946,6 +1088,9 @@ exports.updateBranch = (async function (req, res) {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // update branch
         result = await branchDao.updateBranch(branchName, branchAddress, branchId);
 
@@ -954,7 +1099,15 @@ exports.updateBranch = (async function (req, res) {
     } catch (err) {
         res.querySuccess = false;
     }
-});
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
+    }
+};
 
 /* 
 This method creates a new branch
@@ -978,6 +1131,9 @@ exports.createBranch = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // create the record
         const dbObj = await branchDao.createBranch(branchName, branchAddress);
 
@@ -985,6 +1141,14 @@ exports.createBranch = async (req, res) => {
         res.queryResults = dbObj;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 };
 
@@ -1001,6 +1165,9 @@ exports.deleteBranch = async (req, res) => {
     }
 
     try {
+        // start a new database transaction
+        await db.beginTransaction();
+
         // delete the record
         result = await branchDao.deleteBranch(req.params.id);
 
@@ -1008,6 +1175,14 @@ exports.deleteBranch = async (req, res) => {
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 };
 
@@ -1054,13 +1229,16 @@ exports.getOverdueBookLoans = async (req, res) => {
 //
 exports.extendLoan = async (req, res) => {
 
+    // look for matching book loan to extend
+    let result = await bookLoansDao.findBookLoansById(req.body.loanId);
+    if (result.length == 0) {
+        res.querySuccess = false;
+        return;
+    }
+
     try {
-        // look for matching book loan to extend
-        let result = await bookLoansDao.findBookLoansById(req.body.loanId);
-        if (result.length == 0) {
-            res.querySuccess = false;
-            return;
-        }
+        // start a new database transaction
+        await db.beginTransaction();
 
         // call query to extend overdue book loan by 7 days
         await bookLoansDao.extendOverdueBookLoan(req.body.loanId);
@@ -1069,5 +1247,13 @@ exports.extendLoan = async (req, res) => {
         res.queryResults = result;
     } catch (err) {
         res.querySuccess = false;
+    }
+
+    // end of database transaction;
+    // either commit or rollback depending on querySuccess
+    if (res.querySuccess) {
+        await db.commit();
+    } else {
+        await db.rollback();
     }
 };
