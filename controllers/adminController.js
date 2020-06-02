@@ -41,6 +41,35 @@ routes.get('/lms/admin/authors', async (req, res) => {
     }
 });
 
+routes.get('/lms/admin/authors/like/:name', async (req, res) => {
+    // call service to get all
+    await adminService.getAllAuthorsLike(req.params.name, req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
 routes.get('/lms/admin/authors/:id', async (req, res) => {
     // call service to get author by id
     await adminService.getAuthorById(req, res);
@@ -203,6 +232,35 @@ routes.get('/lms/admin/books', async (req, res) => {
     }
 });
 
+routes.get('/lms/admin/books/like/:title', async (req, res) => {
+    // call service to get all
+    await adminService.getAllBooksLike(req.params.title, req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
 routes.get('/lms/admin/books/:id', async (req, res) => {
     // call service to get book by id
     await adminService.getBookById(req, res);
@@ -339,6 +397,35 @@ routes.delete('/lms/admin/books/:id', async (req, res) => {
 routes.get('/lms/admin/publishers', async (req, res) => {
     // call service to get all
     await adminService.getAllPublishers(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.get('/lms/admin/publishers/like/:name', async (req, res) => {
+    // call service to get all
+    await adminService.getAllPublishersLike(req.params.name, req, res);
 
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
@@ -529,6 +616,35 @@ routes.get('/lms/admin/genres', async (req, res) => {
     }
 });
 
+routes.get('/lms/admin/genres/like/:name', async (req, res) => {
+    // call service to get all
+    await adminService.getAllGenresLike(req.params.name, req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
 routes.get('/lms/admin/genres/:id', async (req, res) => {
     // call service to get genre by id
     await adminService.getGenreById(req, res);
@@ -665,6 +781,35 @@ routes.delete('/lms/admin/genres/:id', async (req, res) => {
 routes.get('/lms/admin/borrowers', async (req, res) => {
     // call service to get all
     await adminService.getBorrowers(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.get('/lms/admin/borrowers/like/:name', async (req, res) => {
+    // call service to get all
+    await adminService.getBorrowersLike(req.params.name, req, res);
 
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
@@ -853,6 +998,35 @@ routes.get('/lms/admin/branches', async (req, res) => {
     }
 });
 
+routes.get('/lms/admin/branches/like/:name', async (req, res) => {
+    // call service to get all
+    await adminService.getBranchesLike(req.params.name, req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
 routes.get('/lms/admin/branches/:id', async (req, res) => {
     // call service to get branch by id
     await adminService.getBranchById(req, res);
@@ -989,6 +1163,35 @@ routes.delete('/lms/admin/branches/:id', async (req, res) => {
 routes.get('/lms/admin/loans', async (req, res) => {
     // call service to get all overdue book loans
     await adminService.getOverdueBookLoans(req, res);
+
+    // prepare & send response depending on success of previous service call
+    if (res.querySuccess) {
+        // send results as json
+        if (req.accepts('json') || req.accepts('text/html')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200);
+            res.send(res.queryResults);
+        }
+        // send results as xml if requested
+        else if (req.accepts('application/xml')) {
+            res.setHeader('Content-Type', 'text/xml');
+            var builder = new xml2js.Builder();
+            var xml = builder.buildObject(res.queryResults);
+            res.status(200);
+            res.send(xml);
+        }
+        // content negotiation failure
+        else {
+            res.send(406);
+        }
+    } else {
+        res.status(400);
+    }
+});
+
+routes.get('/lms/admin/loans/like/:cardno', async (req, res) => {
+    // call service to get all
+    await adminService.getOverdueBookLoansLike(req.params.cardno, req, res);
 
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {

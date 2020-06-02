@@ -12,6 +12,17 @@ exports.getOverdueBookLoans = async () => {
 };
 
 /* 
+This query returns the list of all overdue books by search name
+*/
+exports.getOverdueBookLoansLike = async (cardNo) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM tbl_book_Loans " +
+    "WHERE dueDate < CURRENT_TIMESTAMP() AND cardNo LIKE ?", ['%' + cardNo + '%']);
+  return retVal;
+}
+
+/* 
 This query extends an overdue book by 7 days
 */
 exports.extendOverdueBookLoan = async (id) => {

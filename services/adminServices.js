@@ -30,6 +30,28 @@ exports.getAllAuthors = async (req, res) => {
 };
 
 /* 
+This method returns the list of all authors by search name
+*/
+exports.getAllAuthorsLike = async (name, req, res) => {
+    try {
+        // get all authors by search name
+        result = await authorDao.getAllAuthorsLike(name);
+
+        // for each author, get the books the author wrote
+        for (author of result) {
+            booksResult = await bookDao.getBooksByAuthorId(author.authorId);
+            if (booksResult && booksResult.length > 0) {
+                author.books = booksResult;
+            }
+        }
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
 This method returns an author by id
 */
 exports.getAuthorById = async (req, res) => {
@@ -224,6 +246,36 @@ exports.getAllBooks = async (req, res) => {
     try {
         // get all authors
         result = await bookDao.getAllBooks();
+
+        // for each book, get other info
+        for (book of result) {
+            publisherResult = await bookDao.getPublisherByBookId(book.bookId);
+            if (publisherResult && publisherResult.length > 0) {
+                book.publisher = publisherResult;
+            }
+            authorsResult = await bookDao.getAuthorsByBookId(book.bookId);
+            if (authorsResult && authorsResult.length > 0) {
+                book.authors = authorsResult;
+            }
+            genresResult = await bookDao.getGenresByBookId(book.bookId);
+            if (genresResult && genresResult.length > 0) {
+                book.genres = genresResult;
+            }
+        }
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
+This method returns the list of all books by search title
+*/
+exports.getAllBooksLike = async (title, req, res) => {
+    try {
+        // get all authors
+        result = await bookDao.getAllBooksLike(title);
 
         // for each book, get other info
         for (book of result) {
@@ -500,6 +552,21 @@ exports.getAllPublishers = async (req, res) => {
 };
 
 /* 
+This method returns the list of all publishers by search name
+*/
+exports.getAllPublishersLike = async (name, req, res) => {
+    try {
+        // get all publishers
+        result = await publisherDao.getAllPublishersLike(name);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
 This method returns a publisher by id
 */
 exports.getPublisherById = async (req, res) => {
@@ -671,6 +738,28 @@ exports.getAllGenres = async (req, res) => {
         res.querySuccess = false;
     }
 
+};
+
+/* 
+This method returns the list of all genres by search name
+*/
+exports.getAllGenresLike = async (name, req, res) => {
+    try {
+        // get all genres
+        result = await genreDao.getAllGenresLike(name);
+
+        // for each genre, get the books associated with it
+        for (genre of result) {
+            booksResult = await bookDao.getBooksByGenreId(genre.genre_id);
+            if (booksResult && booksResult.length > 0) {
+                genre.books = booksResult;
+            }
+        }
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
 };
 
 /* 
@@ -876,6 +965,21 @@ exports.getBorrowers = async (req, res) => {
 };
 
 /* 
+This method returns the list of all borrowers by search name
+*/
+exports.getBorrowersLike = async (name, req, res) => {
+    try {
+        // get all authors
+        result = await borrowerDao.getAllBorrowersLike(name);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
 This method returns a borrower by id
 */
 exports.getBorrowerById = async (req, res) => {
@@ -1043,6 +1147,21 @@ exports.getBranches = async (req, res) => {
 };
 
 /* 
+This method returns the list of all library branches by search name
+*/
+exports.getBranchesLike = async (name, req, res) => {
+    try {
+        // get all publishers
+        result = await branchDao.getAllBranchesLike(name);
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
 This method returns a branch by id
 */
 exports.getBranchById = async (req, res) => {
@@ -1187,7 +1306,7 @@ exports.deleteBranch = async (req, res) => {
 };
 
 /* 
-This method returns the list of all library branches
+This method returns the list of all overdue book loans
 */
 exports.getOverdueBookLoans = async (req, res) => {
     let loan = null; // current loan in for loop
@@ -1200,6 +1319,44 @@ exports.getOverdueBookLoans = async (req, res) => {
     try {
         // get all overdue book loans
         let result = await bookLoansDao.getOverdueBookLoans();
+
+        // for each loan, get other info
+        for (loan of result) {
+            bookResult = await bookDao.getBookById(loan.bookId);
+            if (bookResult && bookResult.length > 0) {
+                loan.book = bookResult;
+            }
+            branchResult = await branchDao.getBranchById(loan.branchId);
+            if (branchResult && branchResult.length > 0) {
+                loan.branch = branchResult;
+            }
+            borrowerResult = await borrowerDao.getBorrowerById(loan.cardNo);
+            if (borrowerResult && borrowerResult.length > 0) {
+                loan.borrower = borrowerResult;
+            }
+        }
+
+        res.querySuccess = true;
+        res.queryResults = result;
+    } catch (err) {
+        res.querySuccess = false;
+    }
+};
+
+/* 
+This method returns the list of all overdue book loans by cardNo
+*/
+exports.getOverdueBookLoansLike = async (cardNo, req, res) => {
+    let loan = null; // current loan in for loop
+
+    // holds query results for diffent entity types
+    let bookResult = null;
+    let branchResult = null;
+    let borrowerResult = null;
+
+    try {
+        // get all overdue book loans
+        let result = await bookLoansDao.getOverdueBookLoansLike(cardNo);
 
         // for each loan, get other info
         for (loan of result) {

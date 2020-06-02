@@ -11,6 +11,17 @@ exports.getAllGenres = async () => {
 };
 
 /* 
+This query returns the list of all genres by search name
+*/
+exports.getAllGenresLike = async (name) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_genre " +
+    "WHERE genre_name LIKE ?", ['%' + name + '%']);
+  return retVal;
+}
+
+/* 
 This query returns a genre by id
 */
 exports.getGenreById = async (genre_id) => {
