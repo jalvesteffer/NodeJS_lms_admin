@@ -11,6 +11,17 @@ exports.getAllBranches = async () => {
 };
 
 /* 
+This query returns the list of all library branches by search name
+*/
+exports.getAllBranchesLike = async (name) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_library_branch " +
+    "WHERE branchName LIKE ?", ['%' + name + '%']);
+  return retVal;
+}
+
+/* 
 This query returns a branch by id
 */
 exports.getBranchById = async (id) => {

@@ -11,6 +11,17 @@ exports.getAllAuthors = async () => {
 };
 
 /* 
+This query returns the list of all authors by search name
+*/
+exports.getAllAuthorsLike = async (name) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_author " +
+    "WHERE authorName LIKE ?", ['%' + name + '%']);
+  return retVal;
+}
+
+/* 
 This query returns an author by id
 */
 exports.getAuthorById = async (id) => {

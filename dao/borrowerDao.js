@@ -11,6 +11,17 @@ exports.getAllBorrowers = async () => {
 };
 
 /* 
+This query returns the list of all borrowers by search name
+*/
+exports.getAllBorrowersLike = async (name) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_borrower " +
+    "WHERE name LIKE ?", ['%' + name + '%']);
+  return retVal;
+}
+
+/* 
 This query returns a borrower by id
 */
 exports.getBorrowerById = async (cardNo) => {

@@ -11,6 +11,17 @@ exports.getAllPublishers = async () => {
 };
 
 /* 
+This query returns the list of all publishers by search name
+*/
+exports.getAllPublishersLike = async (name) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_publisher " +
+    "WHERE publisherName LIKE ?", ['%' + name + '%']);
+  return retVal;
+}
+
+/* 
 This query returns a publisher by id
 */
 exports.getPublisherById = async (id) => {

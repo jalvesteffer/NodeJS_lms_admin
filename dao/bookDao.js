@@ -1,7 +1,7 @@
 var db = require('../db').getDb();
 
 /* 
-This query returns the list of all authors
+This query returns the list of all books
 */
 exports.getAllBooks = async () => {
   let books = await db.query(
@@ -9,6 +9,17 @@ exports.getAllBooks = async () => {
     'FROM library.tbl_book');
   return books;
 };
+
+/* 
+This query returns the list of all books by search title
+*/
+exports.getAllBooksLike = async (title) => {
+  let retVal = await db.query(
+    "SELECT * " +
+    "FROM library.tbl_book " +
+    "WHERE title LIKE ?", ['%' + title + '%']);
+  return retVal;
+}
 
 /* 
 This query returns the list of all authors for a book id
