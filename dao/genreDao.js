@@ -6,7 +6,8 @@ This query returns the list of all genres
 exports.getAllGenres = async () => {
   let genres = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_genre');
+    'FROM library.tbl_genre ' +
+    'ORDER BY genre_name');
   return genres;
 };
 
@@ -17,7 +18,8 @@ exports.getAllGenresLike = async (name) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_genre " +
-    "WHERE genre_name LIKE ?", ['%' + name + '%']);
+    "WHERE genre_name LIKE ? " +
+    "ORDER BY genre_name", ['%' + name + '%']);
   return retVal;
 }
 
