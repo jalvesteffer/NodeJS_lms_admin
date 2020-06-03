@@ -6,7 +6,8 @@ This query returns the list of all borrowers
 exports.getAllBorrowers = async () => {
   let borrowers = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_borrower');
+    'FROM library.tbl_borrower ' +
+    'ORDER BY name');
   return borrowers;
 };
 
@@ -17,7 +18,8 @@ exports.getAllBorrowersLike = async (name) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_borrower " +
-    "WHERE name LIKE ?", ['%' + name + '%']);
+    "WHERE name LIKE ? " +
+    "ORDER BY name", ['%' + name + '%']);
   return retVal;
 }
 

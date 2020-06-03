@@ -6,7 +6,8 @@ This query returns the list of all authors
 exports.getAllAuthors = async () => {
   let authors = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_author');
+    'FROM library.tbl_author ' +
+    'ORDER BY authorName ASC');
   return authors;
 };
 
@@ -17,7 +18,8 @@ exports.getAllAuthorsLike = async (name) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_author " +
-    "WHERE authorName LIKE ?", ['%' + name + '%']);
+    "WHERE authorName LIKE ? " +
+    "ORDER BY authorName ASC", ['%' + name + '%']);
   return retVal;
 }
 

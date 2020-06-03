@@ -6,7 +6,8 @@ This query returns the list of all books
 exports.getAllBooks = async () => {
   let books = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_book');
+    'FROM library.tbl_book ' +
+    'ORDER BY title ASC');
   return books;
 };
 
@@ -17,7 +18,8 @@ exports.getAllBooksLike = async (title) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_book " +
-    "WHERE title LIKE ?", ['%' + title + '%']);
+    "WHERE title LIKE ? " +
+    "ORDER BY title ASC", ['%' + title + '%']);
   return retVal;
 }
 

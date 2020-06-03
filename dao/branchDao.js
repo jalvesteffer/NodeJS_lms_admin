@@ -6,7 +6,8 @@ This query returns the list of all library branches
 exports.getAllBranches = async () => {
   let branches = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_library_branch');
+    'FROM library.tbl_library_branch ' +
+    'ORDER BY branchName');
   return branches;
 };
 
@@ -17,7 +18,8 @@ exports.getAllBranchesLike = async (name) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_library_branch " +
-    "WHERE branchName LIKE ?", ['%' + name + '%']);
+    "WHERE branchName LIKE ? " +
+    "ORDER BY branchName", ['%' + name + '%']);
   return retVal;
 }
 

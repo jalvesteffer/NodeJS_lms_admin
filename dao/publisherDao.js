@@ -6,7 +6,8 @@ This query returns the list of all publishers
 exports.getAllPublishers = async () => {
   let retVal = await db.query(
     'SELECT * ' +
-    'FROM library.tbl_publisher');
+    'FROM library.tbl_publisher ' +
+    'ORDER BY publisherName ASC');
   return retVal;
 };
 
@@ -17,7 +18,8 @@ exports.getAllPublishersLike = async (name) => {
   let retVal = await db.query(
     "SELECT * " +
     "FROM library.tbl_publisher " +
-    "WHERE publisherName LIKE ?", ['%' + name + '%']);
+    "WHERE publisherName LIKE ? " +
+    "ORDER BY publisherName ASC", ['%' + name + '%']);
   return retVal;
 }
 
