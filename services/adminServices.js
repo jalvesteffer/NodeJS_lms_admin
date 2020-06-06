@@ -60,7 +60,7 @@ exports.getAuthorById = async (req, res) => {
         result = await authorDao.getAuthorById(req.params.id);
 
         // if result is empty, author by id not found
-        if (result.length == 0) {
+        if (!result[0]) {
             res.querySuccess = false;
             return;
         }
@@ -87,20 +87,10 @@ exports.updateAuthor = async (req, res) => {
     let authorName; // new author name
     let books; // books written by author
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        authorId = body.authorId;
-        authorName = body.authorName;
-        books = body.books;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        authorId = body.authorid[0];
-        authorName = body.authorname[0];
-        books = body.books[0];
-    }
+    body = req.body;
+    authorId = body.authorId;
+    authorName = body.authorName;
+    books = body.books;
 
     try {
         // start a new database transaction
@@ -162,18 +152,9 @@ exports.createAuthor = async (req, res) => {
     let authorName; // new author name
     let books; // books written by author
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        authorName = body.authorName;
-        books = body.books;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        authorName = body.authorname[0];
-        books = body.books[0];
-    }
+    body = req.body;
+    authorName = body.authorName;
+    books = body.books;
 
     try {
         // start a new database transaction
@@ -343,20 +324,10 @@ exports.updateBook = (async function (req, res) {
     let title; // new book title
     let pubId; // new publisher id
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        bookId = body.bookId;
-        title = body.title;
-        pubId = body.pubId;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        bookId = body.bookId[0];
-        title = body.title[0];
-        pubId = body.pubId[0];
-    }
+    body = req.body;
+    bookId = body.bookId;
+    title = body.title;
+    pubId = body.pubId;
 
     try {
         // start a new database transaction
@@ -409,20 +380,10 @@ exports.createBook = async (req, res) => {
     let title; // new book title
     let pubId; // new publisher id
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        bookId = body.bookId;
-        title = body.title;
-        pubId = body.pubId;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        bookId = body.bookId[0];
-        title = body.title[0];
-        pubId = body.pubId[0];
-    }
+    body = req.body;
+    bookId = body.bookId;
+    title = body.title;
+    pubId = body.pubId;
 
     try {
         // start a new database transaction
@@ -597,22 +558,11 @@ exports.updatePublisher = async (req, res) => {
     let publisherAddress; // new publisher address
     let publisherPhone; // new publisher phone
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        publisherId = body.publisherId;
-        publisherName = body.publisherName;
-        publisherAddress = body.publisherAddress;
-        publisherPhone = body.publisherPhone;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        publisherId = body.publisherid[0];
-        publisherName = body.publishername[0];
-        publisherAddress = body.publisheraddress[0];
-        publisherPhone = body.publisherphone[0];
-    }
+    body = req.body;
+    publisherId = body.publisherId;
+    publisherName = body.publisherName;
+    publisherAddress = body.publisherAddress;
+    publisherPhone = body.publisherPhone;
 
     try {
         // start a new database transaction
@@ -645,20 +595,10 @@ exports.createPublisher = async (req, res) => {
     let publisherAddress; // new publisher address
     let publisherPhone; // new publisher phone
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        publisherName = body.publisherName;
-        publisherAddress = body.publisherAddress;
-        publisherPhone = body.publisherPhone;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        publisherName = body.publishername[0];
-        publisherAddress = body.publisheraddress[0];
-        publisherPhone = body.publisherphone[0];
-    }
+    body = req.body;
+    publisherName = body.publisherName;
+    publisherAddress = body.publisherAddress;
+    publisherPhone = body.publisherPhone;
 
     try {
         // start a new database transaction
@@ -798,20 +738,10 @@ exports.updateGenre = async (req, res) => {
     let genre_name; // new genre name
     let books; // books written by author
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        genre_id = body.genre_id;
-        genre_name = body.genre_name;
-        books = body.books;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        genre_id = body.genre_id[0];
-        genre_name = body.genre_name[0];
-        books = body.books[0];
-    }
+    body = req.body;
+    genre_id = body.genre_id;
+    genre_name = body.genre_name;
+    books = body.books;
 
     try {
         // start a new database transaction
@@ -873,18 +803,9 @@ exports.createGenre = async (req, res) => {
     let genre_name; // new genre name
     let books; // books written by author
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        genre_name = body.genre_name;
-        books = body.books;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        genre_name = body.genre_name[0];
-        books = body.books[0];
-    }
+    body = req.body;
+    genre_name = body.genre_name;
+    books = body.books;
 
     try {
         // start a new database transaction
@@ -1010,22 +931,11 @@ exports.updateBorrower = async (req, res) => {
     let phone; // new phone
     let cardNo; // new cardNo
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        name = body.name;
-        address = body.address;
-        phone = body.phone;
-        cardNo = body.cardNo;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        name = body.name[0];
-        address = body.address[0];
-        phone = body.phone[0];
-        cardNo = body.cardno[0];
-    }
+    body = req.body;
+    name = body.name;
+    address = body.address;
+    phone = body.phone;
+    cardNo = body.cardNo;
 
     try {
         // start a new database transaction
@@ -1058,20 +968,10 @@ exports.createBorrower = async (req, res) => {
     let address; // new address
     let phone; // new phone
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        name = body.name;
-        address = body.address;
-        phone = body.phone;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        name = body.name[0];
-        address = body.address[0];
-        phone = body.phone[0];
-    }
+    body = req.body;
+    name = body.name;
+    address = body.address;
+    phone = body.phone;
 
     try {
         // start a new database transaction
@@ -1191,20 +1091,10 @@ exports.updateBranch = async (req, res) => {
     let branchName; // new branch name
     let branchAddress; // new address
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        branchId = body.branchId;
-        branchName = body.branchName;
-        branchAddress = body.branchAddress;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        branchId = body.branchId[0];
-        branchName = body.branchname[0];
-        branchAddress = body.branchaddress[0];
-    }
+    body = req.body;
+    branchId = body.branchId;
+    branchName = body.branchName;
+    branchAddress = body.branchAddress;
 
     try {
         // start a new database transaction
@@ -1236,18 +1126,9 @@ exports.createBranch = async (req, res) => {
     let branchName; // new branch name
     let branchAddress; // new branch address
 
-    // prepare payload in json format
-    if (req.is('application/json') == 'application/json') {
-        body = req.body;
-        branchName = body.branchName;
-        branchAddress = body.branchAddress;
-    }
-    // prepare payload in xml format
-    else if (req.is('application/xml') == 'application/xml') {
-        body = req.body.root;
-        branchName = body.branchname[0];
-        branchAddress = body.branchaddress[0];
-    }
+    body = req.body;
+    branchName = body.branchName;
+    branchAddress = body.branchAddress;
 
     try {
         // start a new database transaction
