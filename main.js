@@ -1,6 +1,7 @@
-var bodyParser = require('body-parser')
-var express = require('express');
-var app = express();
+const bodyParser = require('body-parser')
+const express = require('express');
+const http = require('http');
+const app = express();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -16,7 +17,14 @@ app.use(function (req, res, next) {
 // parse application/json
 app.use(bodyParser.json());
 
+app.get('/lms/healthcheck', (req, res) => {
+  res.end('LMS API Running');
+})
+
 app.use(require('./controllers/adminController'));
 
-app.listen(3001);
+// start server at port
+const server = http.createServer(app).listen(3001);
 console.log('Server running in port: 3001 ...')
+
+module.exports = app;

@@ -19,25 +19,11 @@ routes.get('/lms/admin/authors', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -48,25 +34,11 @@ routes.get('/lms/admin/authors/like/:name', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -77,25 +49,11 @@ routes.get('/lms/admin/authors/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -114,25 +72,11 @@ routes.put('/lms/admin/authors', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -151,25 +95,11 @@ routes.post('/lms/admin/authors', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -180,25 +110,11 @@ routes.delete('/lms/admin/authors/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -210,25 +126,11 @@ routes.get('/lms/admin/books', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -239,25 +141,11 @@ routes.get('/lms/admin/books/like/:title', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -268,25 +156,11 @@ routes.get('/lms/admin/books/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -305,25 +179,11 @@ routes.put('/lms/admin/books', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -342,25 +202,11 @@ routes.post('/lms/admin/books', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -371,25 +217,11 @@ routes.delete('/lms/admin/books/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -401,25 +233,11 @@ routes.get('/lms/admin/publishers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -430,25 +248,11 @@ routes.get('/lms/admin/publishers/like/:name', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -459,25 +263,11 @@ routes.get('/lms/admin/publishers/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -496,25 +286,11 @@ routes.put('/lms/admin/publishers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -533,25 +309,12 @@ routes.post('/lms/admin/publishers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
+
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -562,25 +325,11 @@ routes.delete('/lms/admin/publishers/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -594,25 +343,11 @@ routes.get('/lms/admin/genres', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -623,25 +358,12 @@ routes.get('/lms/admin/genres/like/:name', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
+
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -652,25 +374,11 @@ routes.get('/lms/admin/genres/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -689,25 +397,11 @@ routes.put('/lms/admin/genres', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -726,25 +420,11 @@ routes.post('/lms/admin/genres', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -755,25 +435,11 @@ routes.delete('/lms/admin/genres/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -785,25 +451,11 @@ routes.get('/lms/admin/borrowers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -814,25 +466,11 @@ routes.get('/lms/admin/borrowers/like/:name', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -843,25 +481,11 @@ routes.get('/lms/admin/borrowers/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -880,25 +504,11 @@ routes.put('/lms/admin/borrowers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -917,25 +527,11 @@ routes.post('/lms/admin/borrowers', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -946,25 +542,11 @@ routes.delete('/lms/admin/borrowers/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -976,25 +558,11 @@ routes.get('/lms/admin/branches', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1005,25 +573,11 @@ routes.get('/lms/admin/branches/like/:name', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1034,25 +588,11 @@ routes.get('/lms/admin/branches/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -1071,25 +611,11 @@ routes.put('/lms/admin/branches', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1108,25 +634,11 @@ routes.post('/lms/admin/branches', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201);
-            res.send();
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(201);
-            res.send();
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(201);
+        res.send();
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1137,25 +649,11 @@ routes.delete('/lms/admin/branches/:id', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
@@ -1167,25 +665,11 @@ routes.get('/lms/admin/loans', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1196,25 +680,11 @@ routes.get('/lms/admin/loans/like/:cardno', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
@@ -1226,25 +696,11 @@ routes.put('/lms/admin/loans', async (req, res) => {
     // prepare & send response depending on success of previous service call
     if (res.querySuccess) {
         // send results as json
-        if (req.accepts('json') || req.accepts('text/html')) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200);
-            res.send(res.queryResults);
-        }
-        // send results as xml if requested
-        else if (req.accepts('application/xml')) {
-            res.setHeader('Content-Type', 'text/xml');
-            var builder = new xml2js.Builder();
-            var xml = builder.buildObject(res.queryResults);
-            res.status(200);
-            res.send(xml);
-        }
-        // content negotiation failure
-        else {
-            res.send(406);
-        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.send(res.queryResults);
     } else {
-        res.status(404);
+        res.sendStatus(404);
     }
 });
 
