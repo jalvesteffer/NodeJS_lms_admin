@@ -16,11 +16,11 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/authors")
             .send({
-                authorId: 74,
-                authorName: 'John Doe',
-                books: [{
-                    bookId: 114,
-                    title: "Book Title"
+                "authorId": 2,
+                "authorName": "Dale Carnegie",
+                "books": [{
+                    "bookId": 114,
+                    "title": "How to Win Friends & Influence People"
                 }]
             })
             .end((err, res) => {
@@ -36,20 +36,20 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/books")
             .send({
-                "bookId": 101,
-                "title": "1984",
-                "pubId": 2,
+                "bookId": 148,
+                "title": "The Way of Kings",
+                "pubId": 3,
                 "publisher": [{
-                    "publisherId": 2,
-                    "publisherName": "Penguin Random House"
+                    "publisherId": 3,
+                    "publisherName": "Tor Books"
                 }],
                 "authors": [{
-                    "authorId": 70,
-                    "authorName": "George Orwell"
+                    "authorId": 26,
+                    "authorName": "Brandon Sanderson"
                 }],
                 "genres": [{
-                    "genre_id": 3,
-                    "genre_name": "Literature"
+                    "genre_id": 6,
+                    "genre_name": "Fantasy"
                 }]
             })
             .end((err, res) => {
@@ -65,10 +65,10 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/publishers")
             .send({
-                "publisherId": 19,
-                "publisherName": "Anchor Books",
+                "publisherId": 10,
+                "publisherName": "Bantam Books",
                 "publisherAddress": "New York, USA",
-                "publisherPhone": "365-659-6598"
+                "publisherPhone": "785-578-8785"
             })
             .end((err, res) => {
                 res.should.have.status(200);
@@ -83,8 +83,8 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/genres")
             .send({
-                "genre_id": 38,
-                "genre_name": "Biographies & Memoirs"
+                "genre_id": 31,
+                "genre_name": "Education & Teaching"
             })
             .end((err, res) => {
                 res.should.have.status(200);
@@ -99,10 +99,10 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/borrowers")
             .send({
-                "cardNo": 7,
-                "name": "Bill Brown",
-                "address": "Williamsburg, VA",
-                "phone": "757-458-8788"
+                "cardNo": 5,
+                "name": "Bob Evans",
+                "address": "Charlottesville, VA",
+                "phone": "703-727-5223"
             })
             .end((err, res) => {
                 res.should.have.status(200);
@@ -117,9 +117,9 @@ describe("LMS Test Suite - Admin - Put", () => {
             .request(server)
             .put("/lms/admin/branches")
             .send({
-                "branchId": 3,
-                "branchName": "Arlington Public Library",
-                "branchAddress": "Arlington, VA"
+                "branchId": 10,
+                "branchName": "Ashburn Library",
+                "branchAddress": "Ashburn, VA"
             })
             .end((err, res) => {
                 res.should.have.status(200);
